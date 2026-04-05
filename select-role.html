@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Role — Delhi Private Tutors</title>
+  
+  <!-- Add Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --saffron: #FF9933;
+      --navy: #0A192F;
+      --cream: #F5E6CC;
+      --green: #138808;
+      --text-dark: #2C3E50;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, var(--navy) 0%, #112240 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .brand-header {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: white;
+    }
+    
+    .logo-box {
+      background: var(--saffron);
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
+    .logo-text span { color: var(--saffron); }
+
+    .card {
+      background: #FAFAFA;
+      padding: 3rem;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 2rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .role-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .role-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #F0F2F5;
+      color: var(--navy);
+    }
+
+    .role-btn:hover {
+      background: white;
+      border-color: var(--saffron);
+      transform: translateY(-2px);
+    }
+
+    .role-btn-student {
+      border-color: #ddd;
+    }
+
+    .role-btn-tutor {
+      border-color: #ddd;
+    }
+
+    .role-btn i {
+      color: var(--saffron);
+    }
+
+    .error-msg {
+      margin-top: 1rem;
+      color: #dc2626;
+      background: #fef2f2;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand-header">
+    <div class="logo-box">
+      <i data-lucide="graduation-cap" style="color:var(--navy); width:24px; height:24px;"></i>
+    </div>
+    <div class="logo-text">
+      <h1>Delhi <span>Private</span><br>Tutors</h1>
+    </div>
+    <div style="flex:1"></div>
+    <a href="javascript:void(0)" onclick="handleLogout()" style="color:#aaa; text-decoration:none; font-size:0.9rem;">Sign Out</a>
+  </div>
+
+  <div class="card" id="main-card" style="display: none;">
+    <h2>Welcome!</h2>
+    <p>Please select your account type to continue.</p>
+
+    <div class="role-options">
+      <button class="role-btn role-btn-student" onclick="selectRole('student')">
+        <i data-lucide="book-open"></i>
+        Continue as Student / Parent
+      </button>
+
+      <button class="role-btn role-btn-tutor" onclick="selectRole('tutor')">
+        <i data-lucide="presentation"></i>
+        Continue as Tutor
+      </button>
+    </div>
+
+    <div id="error-msg" class="error-msg"></div>
+  </div>
+
+  <div id="loading" class="loading-overlay">
+    <h2>Initializing...</h2>
+    <p style="color:#8892B0; margin-top:1rem;">Setting up your dashboard</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { initializeFirestore, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",
+      authDomain: "hometutor-2dbc0.firebaseapp.com",
+      projectId: "hometutor-2dbc0",
+      storageBucket: "hometutor-2dbc0.firebasestorage.app",
+      messagingSenderId: "792391008247",
+      appId: "1:792391008247:web:fa9e76a8caa448351d38f2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+    let currentUser = null;
+
+    // Show content when ready
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      currentUser = user;
+
+      // Double check they don't already have a role
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists() && userDoc.data().role) {
+        // They shouldn't be here, they already have a role! Send them to dashboard.
+        const role = userDoc.data().role;
+        window.location.href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-card').style.display = 'block';
+    });
+
+    window.selectRole = async function(role) {
+      if (!currentUser) return;
+      
+      const buttons = document.querySelectorAll('.role-btn');
+      buttons.forEach(btn => btn.style.opacity = '0.5');
+      
+      try {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          role: role
+        });
+        
+        // Success -> redirect
+        window.location.href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
+      } catch (error) {
+        console.error("Error updating role:", error);
+        const errorDiv = document.getElementById('error-msg');
+        errorDiv.textContent = "Failed to secure role. Try again or check connection.";
+        errorDiv.style.display = 'block';
+        buttons.forEach(btn => btn.style.opacity = '1');
+      }
+    };
+
+    window.handleLogout = async function() {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    };
+
+    // Initialize icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
