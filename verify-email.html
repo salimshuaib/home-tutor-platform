@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Email — Delhi Private Tutors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --saffron: #E8751A;
+      --saffron-light: #F5954A;
+      --saffron-dark: #C25A08;
+      --navy: #0F1E3C;
+      --cream: #FDF8F3;
+      --gold: #C9922A;
+      --gold-light: #F0C060;
+      --text-dark: #1A1208;
+      --text-light: #8A7360;
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 70px;
+      background: rgba(15,30,60,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,146,42,0.25);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--white); line-height: 1.1;
+    }
+    .nav-logo-text span { color: var(--gold-light); }
+    [data-lucide] { width: 1em; height: 1em; vertical-align: middle; stroke-width: 2; }
+
+    /* ─── MAIN ─── */
+    .verify-page {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 100px 5vw 60px;
+      position: relative;
+    }
+
+    .verify-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 40%, rgba(232,117,26,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(201,146,42,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #0A1628 0%, #0F1E3C 60%, #0A1628 100%);
+    }
+
+    .verify-card {
+      position: relative; z-index: 2;
+      max-width: 500px; width: 100%;
+      background: var(--white);
+      border-radius: 24px;
+      padding: 56px 44px;
+      text-align: center;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+      animation: fadeUp 0.6s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .verify-icon {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 24px;
+      border: 2px solid #F59E0B;
+    }
+
+    .verify-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .verify-email-address {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--saffron);
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    .verify-text {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .verify-actions {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .btn-verified {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      border: none; border-radius: 8px;
+      color: white; font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(232,117,26,0.35);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-verified:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232,117,26,0.5);
+    }
+    .btn-verified:disabled {
+      opacity: 0.7; pointer-events: none;
+    }
+
+    .btn-resend {
+      width: 100%;
+      padding: 13px;
+      background: var(--white);
+      border: 1.5px solid rgba(15,30,60,0.12);
+      border-radius: 8px;
+      color: var(--text-dark); font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+    }
+    .btn-resend:hover {
+      background: var(--cream);
+      border-color: rgba(232,117,26,0.3);
+    }
+    .btn-resend:disabled {
+      opacity: 0.6; cursor: not-allowed;
+    }
+
+    .verify-footer {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    .verify-footer a {
+      color: var(--saffron);
+      text-decoration: none; font-weight: 600;
+    }
+    .verify-footer a:hover { color: var(--saffron-dark); }
+
+    .msg-box {
+      padding: 12px 16px; border-radius: 8px;
+      font-size: 0.85rem; margin-bottom: 20px;
+      display: none;
+    }
+    .msg-error {
+      background: rgba(239,68,68,0.08);
+      color: #df2a2a;
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .msg-success {
+      background: rgba(34,197,94,0.08);
+      color: #16a34a;
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+
+    @media (max-width: 480px) {
+      .verify-card { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon"><i data-lucide="graduation-cap"></i></div>
+    <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
+  </a>
+</nav>
+
+<main class="verify-page">
+  <div class="verify-bg"></div>
+
+  <div class="verify-card">
+    <div class="verify-icon">📧</div>
+    <h1 class="verify-heading">Please verify your email</h1>
+    <div class="verify-email-address" id="user-email"></div>
+    <p class="verify-text">
+      We've sent a verification link to your email address. Please check your <strong>inbox</strong> and <strong>spam/junk folder</strong>, click the verification link, then come back and press the button below.
+    </p>
+
+    <div id="msg-error" class="msg-box msg-error"></div>
+    <div id="msg-success" class="msg-box msg-success"></div>
+
+    <div class="verify-actions">
+      <button class="btn-verified" id="btn-verified" onclick="checkVerification()">
+        <i data-lucide="check-circle"></i> I Have Verified My Email
+      </button>
+      <button class="btn-resend" id="btn-resend" onclick="resendEmail()">
+        <i data-lucide="mail"></i> Resend Verification Email
+      </button>
+    </div>
+
+    <div class="verify-footer">
+      Wrong email? <a href="login.html">Go back and sign up again</a>
+    </div>
+  </div>
+</main>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, signOut,
+    sendEmailVerification
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",
+    authDomain: "hometutor-2dbc0.firebaseapp.com",
+    projectId: "hometutor-2dbc0",
+    storageBucket: "hometutor-2dbc0.firebasestorage.app",
+    messagingSenderId: "792391008247",
+    appId: "1:792391008247:web:fa9e76a8caa448351d38f2",
+    measurementId: "G-YEJZRFBNDC"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const emailDisplay = document.getElementById('user-email');
+  const msgError = document.getElementById('msg-error');
+  const msgSuccess = document.getElementById('msg-success');
+
+  // BUG 13: Only read email (no password)
+  const storedEmail = sessionStorage.getItem('verifyEmail');
+
+  function showMsg(type, text) {
+    if (type === 'error') {
+      msgError.textContent = text; msgError.style.display = 'block';
+      msgSuccess.style.display = 'none';
+    } else {
+      msgSuccess.textContent = text; msgSuccess.style.display = 'block';
+      msgError.style.display = 'none';
+    }
+  }
+
+  function redirectByRole(role) {
+    const r = (role || '').toLowerCase();
+    if (r === 'student' || r === 'parent') {
+      window.location.href = 'student-dashboard.html';
+    } else {
+      window.location.href = 'tutor-dashboard.html';
+    }
+  }
+
+  // On load, display email and check auth state
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      emailDisplay.textContent = user.email;
+
+      // If already verified, redirect immediately
+      if (user.emailVerified) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const role = userDoc.exists() ? (userDoc.data().role || 'student') : 'student';
+          redirectByRole(role);
+        } catch(e) {
+          redirectByRole('student');
+        }
+      }
+    } else if (storedEmail) {
+      emailDisplay.textContent = storedEmail;
+    } else {
+      // No user & no stored email - send to login
+      window.location.replace('login.html');
+    }
+  });
+
+  // "I Have Verified" button
+  async function checkVerification() {
+    const btn = document.getElementById('btn-verified');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Checking...</span>';
+
+    try {
+      let user = auth.currentUser;
+      if (!user) {
+        showMsg('error', 'Session expired. Please go back and log in again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check-circle"></i> I Have Verified My Email';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      // Reload user to get latest emailVerified status
+      await user.reload();
+      user = auth.currentUser;
+
+      if (user.emailVerified) {
+        showMsg('success', 'Email verified! Redirecting to your dashboard...');
+        // Clean up sessionStorage
+        sessionStorage.removeItem('verifyEmail');
+        sessionStorage.removeItem('pendingVerification');
+
+        // Fetch role and redirect
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const role = userDoc.exists() ? (userDoc.data().role || 'student') : 'student';
+          setTimeout(() => redirectByRole(role), 1000);
+        } catch(e) {
+          setTimeout(() => redirectByRole('student'), 1000);
+        }
+      } else {
+        showMsg('error', 'Email not yet verified. Please click the verification link in your inbox first.');
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check-circle"></i> I Have Verified My Email';
+        if (window.lucide) lucide.createIcons();
+      }
+    } catch(e) {
+      showMsg('error', 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="check-circle"></i> I Have Verified My Email';
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+  window.checkVerification = checkVerification;
+
+  // Resend button
+  async function resendEmail() {
+    const btn = document.getElementById('btn-resend');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        showMsg('error', 'Session expired. Please go back and sign up again.');
+        return;
+      }
+
+      await sendEmailVerification(user);
+      showMsg('success', 'Verification email sent! Check your inbox and spam folder.');
+    } catch(e) {
+      if (e.code === 'auth/too-many-requests') {
+        showMsg('error', 'Too many requests. Please wait a few minutes before trying again.');
+      } else {
+        showMsg('error', 'Failed to resend. Please try again.');
+      }
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="mail"></i> Resend Verification Email';
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+  window.resendEmail = resendEmail;
+</script>
+
+</body>
+</html>

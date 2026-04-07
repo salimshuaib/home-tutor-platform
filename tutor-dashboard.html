@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Dashboard — Delhi Private Tutors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--saffron:#E8751A;--saffron-light:#F5954A;--saffron-dark:#C25A08;--navy:#0F1E3C;--navy-mid:#1A2F5A;--cream:#FDF8F3;--gold:#C9922A;--gold-light:#F0C060;--text-dark:#1A1208;--text-mid:#4A3820;--text-light:#8A7360;--white:#FFFFFF;--card-bg:#FFFDF9;--green:#2E7D32;--red:#C62828;--sidebar-w:260px}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh}
+
+    .loader-overlay{position:fixed;inset:0;background:var(--navy);z-index:2000;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
+    .loader-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--saffron);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{100%{transform:rotate(360deg)}}
+
+    /* NAV */
+    .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:rgba(15,30,60,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(200,146,42,.2)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .nav-logo-icon i{color:white;width:18px;height:18px}
+    .nav-logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);line-height:1.1}
+    .nav-logo-text span{color:var(--gold-light)}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .nav-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy-mid),var(--navy));border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:var(--gold-light);overflow:hidden}
+    .nav-avatar img{width:100%;height:100%;object-fit:cover}
+    .nav-user-name{font-size:.85rem;font-weight:500;color:rgba(255,255,255,.9)}
+    .nav-logout{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);background:transparent;border:1px solid rgba(255,255,255,.12);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:500;font-family:inherit;transition:.2s}
+    .nav-logout:hover{color:var(--saffron-light);border-color:rgba(232,117,26,.4)}
+    .hamburger{display:none;background:none;border:none;color:white;cursor:pointer}
+    .hamburger i{width:24px;height:24px}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;top:64px;left:0;bottom:0;width:var(--sidebar-w);background:var(--white);border-right:1px solid rgba(15,30,60,.08);padding:1.5rem 0;z-index:90;overflow-y:auto;transition:transform .3s}
+    .sidebar-section{padding:0 1rem;margin-bottom:1.5rem}
+    .sidebar-label{font-size:.65rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.1em;padding:0 .75rem;margin-bottom:.5rem}
+    .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px .75rem;border-radius:8px;color:var(--text-mid);font-size:.875rem;font-weight:500;cursor:pointer;transition:.15s;border:none;background:none;width:100%;font-family:inherit;text-align:left}
+    .sidebar-link:hover{background:rgba(232,117,26,.06);color:var(--saffron)}
+    .sidebar-link.active{background:linear-gradient(135deg,rgba(232,117,26,.1),rgba(201,146,42,.06));color:var(--saffron);font-weight:600}
+    .sidebar-link i{width:18px;height:18px;flex-shrink:0}
+    .sidebar-link .badge{margin-left:auto;background:var(--saffron);color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px}
+
+    /* PROFILE COMPLETION */
+    .profile-progress{margin:1rem 1rem 0;padding:1rem;background:rgba(232,117,26,.04);border:1px solid rgba(232,117,26,.1);border-radius:10px}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .progress-header span{font-size:.75rem;font-weight:600;color:var(--text-mid)}
+    .progress-header strong{font-size:.8rem;color:var(--saffron)}
+    .progress-bar{height:6px;background:rgba(15,30,60,.06);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--gold));border-radius:3px;transition:width .5s}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);margin-top:64px;padding:2rem 2.5rem 4rem;min-height:calc(100vh - 64px)}
+
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+    .page-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:var(--navy)}
+    .page-title em{color:var(--saffron);font-style:italic}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.875rem;cursor:pointer;transition:.25s;border:none;font-family:inherit;text-decoration:none}
+    .btn-primary{background:linear-gradient(135deg,var(--saffron),var(--saffron-dark));color:white;box-shadow:0 4px 16px rgba(232,117,26,.25)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,117,26,.4)}
+    .btn-outline{background:transparent;border:1.5px solid rgba(15,30,60,.15);color:var(--text-dark)}
+    .btn-outline:hover{border-color:var(--saffron);color:var(--saffron)}
+    .btn-sm{padding:6px 14px;font-size:.8rem}
+    .btn-danger{background:#fef2f2;color:var(--red);border:1px solid rgba(198,40,40,.15)}
+    .btn-danger:hover{background:var(--red);color:white}
+    .btn-success{background:rgba(46,125,50,.08);color:var(--green);border:1px solid rgba(46,125,50,.15)}
+    .btn-success:hover{background:var(--green);color:white}
+    .btn i{width:16px;height:16px}
+
+    /* STAT CARDS */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--white);border:1px solid rgba(15,30,60,.06);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+    .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .stat-icon i{width:20px;height:20px}
+    .stat-icon.orange{background:rgba(232,117,26,.1);color:var(--saffron)}
+    .stat-icon.blue{background:rgba(26,47,90,.08);color:var(--navy-mid)}
+    .stat-icon.green{background:rgba(46,125,50,.08);color:var(--green)}
+    .stat-icon.gold{background:rgba(201,146,42,.1);color:var(--gold)}
+    .stat-info .stat-num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--navy);line-height:1}
+    .stat-info .stat-label{font-size:.75rem;color:var(--text-light);margin-top:4px}
+
+    /* CARD */
+    .card{background:var(--white);border:1px solid rgba(15,30,60,.06);border-radius:16px;padding:1.5rem;box-shadow:0 4px 20px rgba(0,0,0,.03);margin-bottom:1.5rem}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+    .card-title{font-size:1.1rem;font-weight:700;color:var(--navy)}
+
+    /* LEAD CARDS */
+    .lead-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
+    .lead-card{background:var(--card-bg);border:1px solid rgba(15,30,60,.06);border-radius:14px;padding:1.25rem;transition:.25s;position:relative;overflow:hidden}
+    .lead-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:rgba(232,117,26,.2)}
+    .lead-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--saffron),var(--gold));transform:scaleX(0);transform-origin:left;transition:.3s}
+    .lead-card:hover::before{transform:scaleX(1)}
+    .lead-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:700;margin-bottom:.75rem}
+    .lead-badge.new{background:rgba(232,117,26,.1);color:var(--saffron)}
+    .lead-badge.home{background:rgba(46,125,50,.08);color:var(--green)}
+    .lead-badge.online{background:rgba(26,47,90,.08);color:var(--navy-mid)}
+    .lead-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.75rem}
+    .lead-meta{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+    .lead-row{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--text-mid)}
+    .lead-row i{width:14px;height:14px;color:var(--text-light);flex-shrink:0}
+    .lead-actions{display:flex;gap:.5rem;padding-top:.75rem;border-top:1px solid rgba(15,30,60,.06)}
+
+    /* FORM */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group.full{grid-column:1/-1}
+    .form-label{font-size:.8rem;font-weight:600;color:var(--text-mid)}
+    .form-label .req{color:var(--red)}
+    .form-input,.form-select,.form-textarea{padding:10px 14px;border:1.5px solid rgba(15,30,60,.1);border-radius:8px;font-size:.875rem;font-family:inherit;color:var(--text-dark);background:var(--white);transition:.2s}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,117,26,.08)}
+    .form-textarea{resize:vertical;min-height:80px}
+    .form-hint{font-size:.7rem;color:var(--text-light)}
+
+    /* CHECKBOX GROUP */
+    .check-group{display:flex;flex-wrap:wrap;gap:8px}
+    .check-pill{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1.5px solid rgba(15,30,60,.1);border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:500;color:var(--text-mid);transition:.2s;user-select:none}
+    .check-pill:hover{border-color:var(--saffron);color:var(--saffron)}
+    .check-pill input{display:none}
+    .check-pill.selected{background:rgba(232,117,26,.08);border-color:var(--saffron);color:var(--saffron);font-weight:600}
+
+    /* FILE UPLOAD */
+    .file-upload{border:2px dashed rgba(15,30,60,.12);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:.2s;position:relative}
+    .file-upload:hover{border-color:var(--saffron);background:rgba(232,117,26,.02)}
+    .file-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .file-upload i{width:28px;height:28px;color:var(--text-light);margin-bottom:.5rem}
+    .file-upload p{font-size:.8rem;color:var(--text-light)}
+    .file-upload .file-name{font-size:.8rem;color:var(--saffron);font-weight:600;margin-top:.5rem}
+
+    /* TABS */
+    .tab-bar{display:flex;gap:4px;background:rgba(15,30,60,.04);border-radius:10px;padding:4px;margin-bottom:1.5rem;overflow-x:auto}
+    .tab-btn{padding:8px 18px;border-radius:8px;font-size:.825rem;font-weight:600;cursor:pointer;transition:.2s;border:none;background:transparent;color:var(--text-light);font-family:inherit;white-space:nowrap}
+    .tab-btn.active{background:var(--white);color:var(--saffron);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+
+    /* LEADS LIST */
+    .leads-list{display:flex;flex-direction:column;gap:.75rem}
+    .lead-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--card-bg);border:1px solid rgba(15,30,60,.06);border-radius:12px;transition:.2s}
+    .lead-item:hover{border-color:rgba(232,117,26,.15)}
+    .lead-item-icon{width:40px;height:40px;border-radius:10px;background:rgba(232,117,26,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--saffron)}
+    .lead-item-icon i{width:18px;height:18px}
+    .lead-item-info{flex:1;min-width:0}
+    .lead-item-info h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:2px}
+    .lead-item-info p{font-size:.78rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lead-status{padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:700;white-space:nowrap}
+    .status-contacted{background:#E3F2FD;color:#1565C0}
+    .status-ongoing{background:#E8F5E9;color:var(--green)}
+    .status-closed{background:#ECEFF1;color:#546E7A}
+
+    /* MSG */
+    .msg-bar{padding:12px 16px;border-radius:10px;font-size:.85rem;font-weight:500;margin-bottom:1rem;display:none;align-items:center;gap:8px}
+    .msg-bar i{width:16px;height:16px;flex-shrink:0}
+    .msg-success{display:flex;background:#E8F5E9;color:var(--green);border:1px solid rgba(46,125,50,.15)}
+    .msg-error{display:flex;background:#fef2f2;color:var(--red);border:1px solid rgba(198,40,40,.12)}
+
+    /* EMPTY */
+    .empty-state{text-align:center;padding:3rem 2rem}
+    .empty-state i{width:48px;height:48px;color:var(--gold-light);opacity:.6;margin-bottom:1rem}
+    .empty-state h3{font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem}
+    .empty-state p{color:var(--text-light);font-size:.875rem;max-width:400px;margin:0 auto 1.5rem}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0);box-shadow:8px 0 30px rgba(0,0,0,.1)}
+      .main{margin-left:0}
+      .hamburger{display:block}
+      .form-grid{grid-template-columns:1fr}
+      .lead-grid{grid-template-columns:1fr}
+      .stats-row{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:600px){
+      .top-nav{padding:0 1rem}
+      .main{padding:1.5rem 1rem 3rem}
+      .page-title{font-size:1.4rem}
+      .stats-row{grid-template-columns:1fr}
+      .nav-user-name{display:none}
+    }
+
+    /* BUG 40: SIDEBAR BACKDROP */
+    .sidebar-backdrop{position:fixed;inset:0;z-index:85;background:rgba(15,30,60,.5);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+    .sidebar-backdrop.open{opacity:1;pointer-events:all}
+
+    /* LOADER TIMEOUT */
+    .loader-error{color:rgba(255,255,255,.7);font-size:.9rem;margin-top:1.5rem;text-align:center;display:none}
+    .loader-error .btn{margin-top:.75rem;color:var(--saffron);border:1px solid var(--saffron);background:transparent;padding:8px 20px;border-radius:8px;cursor:pointer;font-family:inherit}
+
+    .section{display:none}
+    .section.active{display:block}
+  </style>
+</head>
+<body>
+
+<!-- Loader (BUG 36: timeout) -->
+<div class="loader-overlay" id="loader">
+  <div>
+    <div class="loader-spinner"></div>
+    <div class="loader-error" id="loader-error">
+      <p>Loading is taking too long.</p>
+      <button class="btn" onclick="window.location.reload()">Retry</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUG 40: Sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<!-- NAV -->
+<header class="top-nav">
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="hamburger" id="hamburger-btn"><i data-lucide="menu"></i></button>
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logo-icon"><i data-lucide="graduation-cap"></i></div>
+      <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
+    </a>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:10px;color:white">
+      <div class="nav-avatar" id="nav-avatar">T</div>
+      <span class="nav-user-name" id="nav-user-name">Tutor</span>
+    </div>
+    <button class="nav-logout" id="logout-btn"><i data-lucide="log-out"></i> Logout</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Dashboard</div>
+    <button class="sidebar-link active" data-section="overview"><i data-lucide="layout-dashboard"></i> Overview</button>
+    <button class="sidebar-link" data-section="matches"><i data-lucide="zap"></i> Matched Tuitions <span class="badge" id="match-badge" style="display:none">0</span></button>
+    <button class="sidebar-link" data-section="leads"><i data-lucide="handshake"></i> My Leads</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Account</div>
+    <button class="sidebar-link" data-section="profile"><i data-lucide="user-cog"></i> My Profile</button>
+    <button class="sidebar-link" data-section="settings"><i data-lucide="settings"></i> Settings</button>
+  </div>
+  <div class="profile-progress" id="profile-progress-box">
+    <div class="progress-header"><span>Profile Completion</span><strong id="progress-pct">0%</strong></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- OVERVIEW -->
+  <div class="section active" id="sec-overview">
+    <div class="page-header">
+      <h1 class="page-title">Welcome, <em id="welcome-name">Tutor</em></h1>
+      <button class="btn btn-primary" onclick="switchSection('profile')"><i data-lucide="user-cog"></i> Complete Profile</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon orange"><i data-lucide="zap"></i></div><div class="stat-info"><div class="stat-num" id="s-matches">0</div><div class="stat-label">New Matches</div></div></div>
+      <div class="stat-card"><div class="stat-icon green"><i data-lucide="check-circle"></i></div><div class="stat-info"><div class="stat-num" id="s-accepted">0</div><div class="stat-label">Accepted Leads</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue"><i data-lucide="clock"></i></div><div class="stat-info"><div class="stat-num" id="s-ongoing">0</div><div class="stat-label">Ongoing</div></div></div>
+      <div class="stat-card"><div class="stat-icon gold"><i data-lucide="trending-up"></i></div><div class="stat-info"><div class="stat-num" id="s-profile">0%</div><div class="stat-label">Profile Score</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Recent Matched Tuitions</h3><button class="btn btn-outline btn-sm" onclick="switchSection('matches')">View All</button></div>
+      <div id="overview-matches"><div class="empty-state"><i data-lucide="inbox"></i><h3>No matches yet</h3><p>Complete your profile to start receiving matched tuition leads in your area.</p><button class="btn btn-primary" onclick="switchSection('profile')"><i data-lucide="user-cog"></i> Complete Profile</button></div></div>
+    </div>
+  </div>
+
+  <!-- MATCHED TUITIONS -->
+  <div class="section" id="sec-matches">
+    <div class="page-header"><h1 class="page-title">Matched <em>Tuitions</em></h1></div>
+    <div id="matches-container"><div class="empty-state"><i data-lucide="inbox"></i><h3>No matches yet</h3><p>Complete your profile with subjects, classes, and location to receive matching student requirements.</p></div></div>
+  </div>
+
+  <!-- MY LEADS -->
+  <div class="section" id="sec-leads">
+    <div class="page-header"><h1 class="page-title">My <em>Leads</em></h1></div>
+    <div class="tab-bar"><button class="tab-btn active" data-filter="all">All</button><button class="tab-btn" data-filter="contacted">Contacted</button><button class="tab-btn" data-filter="ongoing">Ongoing</button><button class="tab-btn" data-filter="closed">Closed</button></div>
+    <div id="leads-list"><div class="empty-state"><i data-lucide="inbox"></i><h3>No leads yet</h3><p>Accept matched tuitions to start building your lead pipeline.</p></div></div>
+  </div>
+
+  <!-- MY PROFILE -->
+  <div class="section" id="sec-profile">
+    <div class="page-header"><h1 class="page-title">My <em>Profile</em></h1></div>
+    <div id="profile-msg" class="msg-bar"></div>
+
+    <!-- Basic Info -->
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Basic Information</h3></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Full Name <span class="req">*</span></label><input class="form-input" id="p-name" placeholder="Your full name"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="p-email" placeholder="email@example.com" readonly style="background:#f5f5f5;cursor:not-allowed"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="p-phone" placeholder="+91 98765 43210"></div>
+        <div class="form-group"><label class="form-label">Years of Experience</label><input class="form-input" type="number" id="p-experience" placeholder="e.g. 5" min="0"></div>
+        <div class="form-group full"><label class="form-label">Tagline</label><input class="form-input" id="p-tagline" placeholder="e.g. Math Expert with 5 years experience"></div>
+        <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-textarea" id="p-bio" placeholder="Describe your teaching experience, methodology, achievements..." style="min-height:100px"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Subjects & Classes -->
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Subjects & Classes</h3></div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Boards You Teach</label>
+          <div class="check-group" id="boards-group">
+            <label class="check-pill"><input type="checkbox" value="CBSE">CBSE</label>
+            <label class="check-pill"><input type="checkbox" value="ICSE">ICSE</label>
+            <label class="check-pill"><input type="checkbox" value="State Board">State Board</label>
+            <label class="check-pill"><input type="checkbox" value="IB">IB</label>
+            <label class="check-pill"><input type="checkbox" value="Other">Other</label>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Subjects You Teach</label>
+          <div class="check-group" id="subjects-group">
+            <label class="check-pill"><input type="checkbox" value="Mathematics">Mathematics</label>
+            <label class="check-pill"><input type="checkbox" value="Physics">Physics</label>
+            <label class="check-pill"><input type="checkbox" value="Chemistry">Chemistry</label>
+            <label class="check-pill"><input type="checkbox" value="Biology">Biology</label>
+            <label class="check-pill"><input type="checkbox" value="English">English</label>
+            <label class="check-pill"><input type="checkbox" value="Hindi">Hindi</label>
+            <label class="check-pill"><input type="checkbox" value="Social Science">Social Science</label>
+            <label class="check-pill"><input type="checkbox" value="Computer Science">Computer Science</label>
+            <label class="check-pill"><input type="checkbox" value="Accountancy">Accountancy</label>
+            <label class="check-pill"><input type="checkbox" value="Business Studies">Business Studies</label>
+            <label class="check-pill"><input type="checkbox" value="Economics">Economics</label>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Classes You Teach</label>
+          <div class="check-group" id="classes-group">
+            <label class="check-pill"><input type="checkbox" value="1-5">1st – 5th</label>
+            <label class="check-pill"><input type="checkbox" value="6-8">6th – 8th</label>
+            <label class="check-pill"><input type="checkbox" value="9-10">9th – 10th</label>
+            <label class="check-pill"><input type="checkbox" value="11-12">11th – 12th</label>
+            <label class="check-pill"><input type="checkbox" value="College">College</label>
+            <label class="check-pill"><input type="checkbox" value="Competitive">Competitive Exams</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location & Mode -->
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Location & Teaching Mode</h3></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Area / Locality</label><input class="form-input" id="p-area" placeholder="e.g. Lajpat Nagar"></div>
+        <div class="form-group"><label class="form-label">City</label><input class="form-input" id="p-city" placeholder="e.g. New Delhi" value="New Delhi"></div>
+        <div class="form-group full">
+          <label class="form-label">Teaching Mode</label>
+          <div class="check-group" id="mode-group">
+            <label class="check-pill"><input type="checkbox" value="Home Tuition">Home Tuition</label>
+            <label class="check-pill"><input type="checkbox" value="Online">Online</label>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Monthly Fee (₹)</label><input class="form-input" type="number" id="p-fee" placeholder="e.g. 8000" min="0"></div>
+      </div>
+    </div>
+
+    <!-- Uploads -->
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Documents</h3></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Profile Photo</label>
+          <div class="file-upload" id="photo-upload">
+            <i data-lucide="camera"></i>
+            <p>Click to upload (JPG only, max 5MB)</p>
+            <div class="file-name" id="photo-name"></div>
+            <input type="file" accept=".jpg,.jpeg" id="p-photo">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Education Certificate</label>
+          <div class="file-upload" id="cert-upload">
+            <i data-lucide="file-text"></i>
+            <p>Click to upload (JPG/PDF, max 6MB)</p>
+            <div class="file-name" id="cert-name"></div>
+            <input type="file" accept=".jpg,.jpeg,.pdf" id="p-cert">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="save-profile-btn" style="margin-top:.5rem"><i data-lucide="save"></i> Save Profile</button>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section" id="sec-settings">
+    <div class="page-header"><h1 class="page-title"><em>Settings</em></h1></div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Account</h3></div>
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Email Notifications</label>
+          <div class="check-group"><label class="check-pill"><input type="checkbox" checked>New Lead Alerts</label><label class="check-pill"><input type="checkbox" checked>Profile Views</label><label class="check-pill"><input type="checkbox">Marketing</label></div>
+        </div>
+        <div class="form-group full" style="margin-top:1rem"><label class="form-label">Danger Zone</label><button class="btn btn-danger btn-sm" onclick="alert('Contact support to delete account.')"><i data-lucide="trash-2"></i> Delete Account</button></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>lucide.createIcons();</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  const app = initializeApp({apiKey:"AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",authDomain:"hometutor-2dbc0.firebaseapp.com",projectId:"hometutor-2dbc0",storageBucket:"hometutor-2dbc0.firebasestorage.app",messagingSenderId:"792391008247",appId:"1:792391008247:web:fa9e76a8caa448351d38f2"});
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null;
+  let tutorProfile = {};
+  let acceptedLeads = [];
+
+  /* ── CHECK-PILL TOGGLE ── */
+  document.querySelectorAll('.check-pill input').forEach(inp => {
+    inp.addEventListener('change', () => inp.closest('.check-pill').classList.toggle('selected', inp.checked));
+  });
+
+  /* ── FILE UPLOAD VALIDATION ── */
+  document.getElementById('p-photo').addEventListener('change', function() {
+    const f = this.files[0];
+    if (!f) return;
+    if (!f.type.match(/image\/jpe?g/)) { alert('Profile photo must be JPG format.'); this.value = ''; return; }
+    if (f.size > 5 * 1024 * 1024) { alert('Photo must be under 5MB.'); this.value = ''; return; }
+    document.getElementById('photo-name').textContent = f.name;
+  });
+  document.getElementById('p-cert').addEventListener('change', function() {
+    const f = this.files[0];
+    if (!f) return;
+    if (!f.type.match(/image\/jpe?g/) && f.type !== 'application/pdf') { alert('Certificate must be JPG or PDF.'); this.value = ''; return; }
+    if (f.size > 6 * 1024 * 1024) { alert('Certificate must be under 6MB.'); this.value = ''; return; }
+    document.getElementById('cert-name').textContent = f.name;
+  });
+
+  /* BUG 36: Loading timeout */
+  const loaderTimeout = setTimeout(() => {
+    const errEl = document.getElementById('loader-error');
+    if (errEl) errEl.style.display = 'block';
+  }, 10000);
+
+  /* ── AUTH ── */
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.replace('login.html?role=tutor'); return; }
+    const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+    if (!isGoogle && !user.emailVerified) { window.location.replace('login.html?role=tutor'); return; }
+
+    currentUser = user;
+    let displayName = 'Tutor';
+
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.role && (d.role.toLowerCase() === 'student' || d.role.toLowerCase() === 'parent')) { window.location.replace('student-dashboard.html'); return; }
+        tutorProfile = d;
+        displayName = d.fullName || user.displayName || 'Tutor';
+        populateProfile(d, user);
+      }
+    } catch(e) { /* silenced BUG 17 */ }
+
+    const first = displayName.split(' ')[0];
+    const initials = displayName.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('nav-user-name').textContent = first;
+    document.getElementById('nav-avatar').textContent = initials;
+    document.getElementById('welcome-name').textContent = first;
+    updateProfileCompletion();
+
+    await loadLeads();
+    await loadMatches();
+
+    clearTimeout(loaderTimeout);
+    document.getElementById('loader').style.opacity = '0';
+    setTimeout(() => document.getElementById('loader').style.display = 'none', 400);
+  });
+
+  /* ── POPULATE PROFILE FORM ── */
+  function populateProfile(d, user) {
+    document.getElementById('p-name').value = d.fullName || '';
+    /* BUG 21: Email field is read-only, always use auth email */
+    document.getElementById('p-email').value = (user ? user.email : d.email) || '';
+    document.getElementById('p-phone').value = d.phone || '';
+    document.getElementById('p-experience').value = d.experience || '';
+    document.getElementById('p-tagline').value = d.tagline || '';
+    document.getElementById('p-bio').value = d.bio || '';
+    document.getElementById('p-area').value = d.area || '';
+    document.getElementById('p-city').value = d.city || 'New Delhi';
+    document.getElementById('p-fee').value = d.fee || '';
+
+    // Restore checkboxes
+    (d.boards || []).forEach(v => { const el = document.querySelector(`#boards-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
+    (d.subjects || []).forEach(v => { const el = document.querySelector(`#subjects-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
+    (d.classes || []).forEach(v => { const el = document.querySelector(`#classes-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
+    (d.mode || []).forEach(v => { const el = document.querySelector(`#mode-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
+  }
+
+  /* ── PROFILE COMPLETION ── */
+  function updateProfileCompletion() {
+    const fields = ['fullName','email','phone','tagline','bio','area','experience'];
+    const arrays = ['boards','subjects','classes','mode'];
+    let filled = 0, total = fields.length + arrays.length;
+    fields.forEach(f => { if (tutorProfile[f]) filled++; });
+    arrays.forEach(f => { if (tutorProfile[f] && tutorProfile[f].length > 0) filled++; });
+    const pct = Math.round((filled / total) * 100);
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('s-profile').textContent = pct + '%';
+  }
+
+  /* ── SAVE PROFILE ── */
+  document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('save-profile-btn');
+    btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Saving...'; lucide.createIcons();
+
+    const getChecked = (groupId) => [...document.querySelectorAll(`#${groupId} input:checked`)].map(i => i.value);
+    const data = {
+      fullName: document.getElementById('p-name').value.trim(),
+      email: document.getElementById('p-email').value.trim(),
+      phone: document.getElementById('p-phone').value.trim(),
+      experience: Number(document.getElementById('p-experience').value) || 0, /* BUG 19 */
+      tagline: document.getElementById('p-tagline').value.trim(),
+      bio: document.getElementById('p-bio').value.trim(),
+      area: document.getElementById('p-area').value.trim(),
+      city: document.getElementById('p-city').value.trim(),
+      fee: Number(document.getElementById('p-fee').value) || 0, /* BUG 19 */
+      preferredLocation: document.getElementById('p-area').value.trim(), /* for student search */
+      boards: getChecked('boards-group'),
+      subjects: getChecked('subjects-group'),
+      classes: getChecked('classes-group'),
+      mode: getChecked('mode-group'),
+      updatedAt: serverTimestamp()
+    };
+
+    try {
+      await updateDoc(doc(db, 'users', currentUser.uid), data);
+      tutorProfile = { ...tutorProfile, ...data };
+      updateProfileCompletion();
+      showMsg('profile-msg', 'Profile saved successfully!', 'success');
+      const first = data.fullName.split(' ')[0] || 'Tutor';
+      document.getElementById('nav-user-name').textContent = first;
+      document.getElementById('welcome-name').textContent = first;
+      await loadMatches();
+    } catch(e) {
+      showMsg('profile-msg', 'Failed to save profile. Please try again.', 'error');
+    }
+    btn.disabled = false; btn.innerHTML = '<i data-lucide="save"></i> Save Profile'; lucide.createIcons();
+  });
+
+  /* ── LOAD MATCHES ── */
+  async function loadMatches() {
+    try {
+      const q = query(collection(db, 'requests'), where('status', '==', 'pending'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      const all = []; snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+
+      // Filter by tutor profile
+      const matched = all.filter(r => {
+        if (!tutorProfile.subjects || tutorProfile.subjects.length === 0) return true; // show all if no profile
+        return tutorProfile.subjects.some(s => s.toLowerCase() === (r.subject || '').toLowerCase());
+      });
+
+      document.getElementById('s-matches').textContent = matched.length;
+      const badge = document.getElementById('match-badge');
+      if (matched.length > 0) { badge.textContent = matched.length; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+
+      renderMatches(matched);
+    } catch(e) { /* silenced BUG 17 */ }
+  }
+
+  /* BUG 14: Safe text helper */
+  function safeText(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+  function renderMatches(list) {
+    const containers = ['matches-container', 'overview-matches'];
+    if (list.length === 0) {
+      const empty = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No matches yet</h3><p>Complete your profile to receive relevant student requirements.</p></div>`;
+      containers.forEach(id => document.getElementById(id).innerHTML = empty);
+      lucide.createIcons(); return;
+    }
+    const html = `<div class="lead-grid">${list.map(r => {
+      const modeClass = (r.mode||'').includes('Online') ? 'online' : 'home';
+      return `<div class="lead-card">
+        <span class="lead-badge ${modeClass}">${safeText(r.mode) || 'Home'}</span>
+        <div class="lead-title">${safeText(r.subject)} — ${safeText(r.className)}</div>
+        <div class="lead-meta">
+          <div class="lead-row"><i data-lucide="map-pin"></i>${safeText(r.location) || 'N/A'}</div>
+          <div class="lead-row"><i data-lucide="indian-rupee"></i>₹${Number(r.budget||0).toLocaleString('en-IN')}/mo</div>
+          <div class="lead-row"><i data-lucide="clock"></i>${safeText(r.timing) || 'Flexible'}</div>
+          ${r.notes ? `<div class="lead-row"><i data-lucide="message-circle"></i>${safeText(r.notes)}</div>` : ''}
+        </div>
+        <div class="lead-actions">
+          <button class="btn btn-success btn-sm" onclick="acceptLead('${r.id}')"><i data-lucide="check"></i> Accept Lead</button>
+          <button class="btn btn-outline btn-sm" onclick="ignoreLead(this)"><i data-lucide="x"></i> Ignore</button>
+        </div>
+      </div>`}).join('')}</div>`;
+    document.getElementById('matches-container').innerHTML = html;
+    document.getElementById('overview-matches').innerHTML = `<div class="lead-grid">${list.slice(0,3).map(r => `<div class="lead-card">
+      <span class="lead-badge new">New</span><div class="lead-title">${safeText(r.subject)} — ${safeText(r.className)}</div>
+      <div class="lead-meta"><div class="lead-row"><i data-lucide="map-pin"></i>${safeText(r.location)||'N/A'}</div><div class="lead-row"><i data-lucide="indian-rupee"></i>₹${Number(r.budget||0).toLocaleString('en-IN')}/mo</div></div>
+    </div>`).join('')}</div>`;
+    lucide.createIcons();
+  }
+
+  /* ── ACCEPT / IGNORE ── */
+  window.acceptLead = async function(reqId) {
+    if (!currentUser) return;
+    try {
+      await addDoc(collection(db, 'leads'), { tutorId: currentUser.uid, requestId: reqId, status: 'contacted', acceptedAt: serverTimestamp() });
+      showMsg('profile-msg', 'Lead accepted!', 'success');
+      await loadLeads(); await loadMatches();
+    } catch(e) { showMsg('profile-msg', 'Failed to accept lead.', 'error'); }
+  };
+  window.ignoreLead = function(btn) { btn.closest('.lead-card').style.display = 'none'; };
+
+  /* ── LOAD LEADS ── */
+  async function loadLeads() {
+    if (!currentUser) return;
+    try {
+      const q = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid), orderBy('acceptedAt', 'desc'));
+      const snap = await getDocs(q); acceptedLeads = [];
+      snap.forEach(d => acceptedLeads.push({ id: d.id, ...d.data() }));
+    } catch(e) { acceptedLeads = []; }
+    document.getElementById('s-accepted').textContent = acceptedLeads.length;
+    document.getElementById('s-ongoing').textContent = acceptedLeads.filter(l => l.status === 'ongoing').length;
+    renderLeads();
+  }
+
+  function renderLeads(filter = 'all') {
+    const list = filter === 'all' ? acceptedLeads : acceptedLeads.filter(l => l.status === filter);
+    const container = document.getElementById('leads-list');
+    if (list.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No leads ${filter!=='all'?'with this status':'yet'}</h3><p>Accept matched tuitions to build your pipeline.</p></div>`;
+      lucide.createIcons(); return;
+    }
+    container.innerHTML = `<div class="leads-list">${list.map(l => {
+      const sc = l.status==='contacted'?'status-contacted':l.status==='ongoing'?'status-ongoing':'status-closed';
+      const sl = l.status==='contacted'?'Contacted':l.status==='ongoing'?'Ongoing':'Closed';
+      return `<div class="lead-item">
+        <div class="lead-item-icon"><i data-lucide="book-open"></i></div>
+        <div class="lead-item-info"><h4>Lead #${l.requestId.substring(0,6)}</h4><p>Accepted ${l.acceptedAt ? new Date(l.acceptedAt.seconds*1000).toLocaleDateString('en-IN') : ''}</p></div>
+        <span class="lead-status ${sc}">${sl}</span>
+      </div>`;
+    }).join('')}</div>`;
+    lucide.createIcons();
+  }
+
+  /* ── LEAD FILTER TABS ── */
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLeads(btn.dataset.filter);
+  }));
+
+  /* ── SIDEBAR NAV ── */
+  function switchSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.section === name));
+    document.getElementById('sidebar').classList.remove('open');
+    lucide.createIcons();
+  }
+  window.switchSection = switchSection;
+  document.querySelectorAll('.sidebar-link').forEach(l => l.addEventListener('click', () => switchSection(l.dataset.section)));
+  /* BUG 40: Sidebar backdrop */
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  document.getElementById('hamburger-btn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    sidebarBackdrop.classList.toggle('open');
+  });
+  sidebarBackdrop.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    sidebarBackdrop.classList.remove('open');
+  });
+
+  /* ── LOGOUT ── */
+  document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(() => window.location.href = 'login.html'));
+
+  /* ── MSG ── */
+  function showMsg(elId, text, type) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.className = 'msg-bar msg-' + type;
+    el.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}"></i> ${text}`;
+    el.style.display = 'flex';
+    lucide.createIcons();
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delhi Private Tutors — Expert Home Tuition in Delhi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --saffron: #E8751A;
+      --saffron-light: #F5954A;
+      --saffron-dark: #C25A08;
+      --navy: #0F1E3C;
+      --navy-mid: #1A2F5A;
+      --cream: #FDF8F3;
+      --gold: #C9922A;
+      --gold-light: #F0C060;
+      --text-dark: #1A1208;
+      --text-mid: #4A3820;
+      --text-light: #8A7360;
+      --white: #FFFFFF;
+      --card-bg: #FFFDF9;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 70px;
+      background: rgba(15,30,60,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,146,42,0.25);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .nav-logo-text span { color: var(--gold-light); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold-light); }
+
+    .nav-cta {
+      display: flex; gap: 10px;
+    }
+    .btn-nav {
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-nav-outline {
+      border: 1px solid rgba(200,146,42,0.5);
+      color: var(--gold-light);
+      background: transparent;
+    }
+    .btn-nav-outline:hover { background: rgba(200,146,42,0.1); }
+    .btn-nav-fill {
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white;
+      border: none;
+    }
+    .btn-nav-fill:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,117,26,0.4); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      background: var(--navy);
+      position: relative;
+      display: flex; align-items: center;
+      overflow: hidden;
+      padding: 100px 5vw 60px;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 40%, rgba(232,117,26,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(201,146,42,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #0A1628 0%, #0F1E3C 60%, #0A1628 100%);
+    }
+
+    /* Decorative grid */
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: rgba(232,117,26,0.15);
+      top: -100px; right: 10%;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: rgba(201,146,42,0.1);
+      bottom: 5%; left: 5%;
+      animation-delay: 3s;
+    }
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,117,26,0.12);
+      border: 1px solid rgba(232,117,26,0.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--saffron);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .hero-badge span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--saffron-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 4vw, 3.8rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 22px;
+    }
+    .hero-title .accent { color: var(--gold-light); font-style: italic; }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.75;
+      margin-bottom: 40px;
+      font-weight: 300;
+      max-width: 520px;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(232,117,26,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232,117,26,0.5);
+    }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-item {}
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* Hero Right - Two cards */
+    .hero-cards {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    .path-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 28px 30px;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .path-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--saffron), var(--gold));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+    .path-card:hover::before { transform: scaleX(1); }
+    .path-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(232,117,26,0.3);
+      transform: translateY(-3px);
+    }
+
+    .path-card-icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .path-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .path-card-desc {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+    .path-card-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .tag-free { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+    .tag-pro { background: rgba(232,117,26,0.15); color: var(--saffron-light); border: 1px solid rgba(232,117,26,0.3); }
+
+    /* ─── SECTION BASE ─── */
+    section { padding: 90px 5vw; }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--saffron);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-title .italic { font-style: italic; color: var(--saffron); }
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-light);
+      line-height: 1.75;
+      max-width: 560px;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .hiw { background: var(--white); }
+    .hiw-inner { max-width: 1100px; margin: 0 auto; }
+    .hiw-header { text-align: center; margin-bottom: 60px; }
+    .hiw-header .section-desc { margin: 0 auto; }
+
+    .hiw-tabs {
+      display: flex; justify-content: center; gap: 12px;
+      margin-bottom: 50px;
+    }
+    .hiw-tab {
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      border: 1.5px solid transparent;
+    }
+    .hiw-tab.active {
+      background: var(--navy);
+      color: white;
+    }
+    .hiw-tab:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+      background: transparent;
+    }
+    .hiw-tab:not(.active):hover { background: rgba(15,30,60,0.05); }
+
+    .hiw-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .step-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+      border: 1px solid rgba(232,117,26,0.12);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(15,30,60,0.1);
+    }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: rgba(232,117,26,0.12);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .step-icon {
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .step-text {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      line-height: 1.7;
+    }
+
+    /* ─── PRICING ─── */
+    .pricing-section {
+      background: linear-gradient(135deg, #0A1628 0%, #0F1E3C 50%, #0A1628 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 70% at 30% 50%, rgba(232,117,26,0.08) 0%, transparent 70%);
+    }
+    .pricing-inner { max-width: 1000px; margin: 0 auto; position: relative; }
+    .pricing-header { text-align: center; margin-bottom: 56px; }
+    .pricing-header .section-title { color: var(--white); }
+    .pricing-header .section-desc { color: rgba(255,255,255,0.6); margin: 0 auto; }
+
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .price-card {
+      border-radius: 20px;
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+
+    .price-card-student {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .price-card-teacher {
+      background: linear-gradient(145deg, rgba(232,117,26,0.15), rgba(201,146,42,0.1));
+      border: 1px solid rgba(232,117,26,0.4);
+    }
+    .price-card-teacher::before {
+      content: 'POPULAR';
+      position: absolute; top: 20px; right: 20px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: var(--saffron);
+      color: white;
+      padding: 4px 10px; border-radius: 100px;
+    }
+
+    .price-icon { font-size: 2.5rem; margin-bottom: 20px; display: block; }
+    .price-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .price-sub { font-size: 0.875rem; color: rgba(255,255,255,0.5); margin-bottom: 28px; }
+    .price-amount {
+      margin-bottom: 28px;
+    }
+    .price-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .price-per { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    .price-features {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+    .price-features li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.75);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      line-height: 1.5;
+    }
+    .price-features li:last-child { border-bottom: none; }
+    .price-features .check { color: var(--saffron-light); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+    .btn-card-student {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+      display: block;
+      text-decoration: none;
+    }
+    .btn-card-student:hover { background: rgba(255,255,255,0.07); }
+    .btn-card-teacher {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+      display: block;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(232,117,26,0.4);
+    }
+    .btn-card-teacher:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,117,26,0.5); }
+
+    /* ─── SUBJECTS ─── */
+    .subjects { background: var(--cream); }
+    .subjects-inner { max-width: 1100px; margin: 0 auto; }
+    .subjects-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .subject-card {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+      border: 1px solid rgba(232,117,26,0.1);
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .subject-card:hover {
+      border-color: var(--saffron);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(232,117,26,0.15);
+    }
+    .subject-card:hover .subject-icon { transform: scale(1.15); }
+    .subject-icon { font-size: 2rem; display: block; margin-bottom: 12px; transition: transform 0.25s; }
+    .subject-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .subject-level { font-size: 0.75rem; color: var(--text-light); }
+
+    /* ─── WHY CHOOSE US ─── */
+    .why { background: var(--white); }
+    .why-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .why-visual {
+      position: relative;
+    }
+    .why-big-card {
+      background: var(--navy);
+      border-radius: 20px;
+      padding: 40px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .why-big-card::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(232,117,26,0.2), transparent 70%);
+    }
+    .why-card-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      color: var(--gold-light);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .why-card-text {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .why-card-author {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .why-avatar {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .why-author-name { font-weight: 600; font-size: 0.875rem; }
+    .why-author-role { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+    .why-float-stat {
+      position: absolute;
+      bottom: -20px; right: -20px;
+      background: var(--saffron);
+      border-radius: 14px;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(232,117,26,0.4);
+    }
+    .why-float-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+    }
+    .why-float-label { font-size: 0.7rem; color: rgba(255,255,255,0.85); margin-top: 2px; }
+
+    .why-points { list-style: none; }
+    .why-point {
+      display: flex; gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(232,117,26,0.1);
+    }
+    .why-point:last-child { border-bottom: none; }
+    .why-point-icon {
+      width: 44px; height: 44px;
+      background: rgba(232,117,26,0.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .why-point-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .why-point-text { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonials { background: var(--cream); }
+    .testimonials-inner { max-width: 1100px; margin: 0 auto; }
+    .testimonials-header { text-align: center; margin-bottom: 52px; }
+    .testimonials-header .section-desc { margin: 0 auto; }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testi-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid rgba(232,117,26,0.1);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .testi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(15,30,60,0.08);
+    }
+    .testi-stars { color: #F5A623; font-size: 0.875rem; margin-bottom: 14px; }
+    .testi-text {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+    }
+    .av1 { background: linear-gradient(135deg, #E8751A, #C25A08); }
+    .av2 { background: linear-gradient(135deg, #1A2F5A, #0A1628); }
+    .av3 { background: linear-gradient(135deg, #C9922A, #E8751A); }
+    .testi-name { font-weight: 700; font-size: 0.875rem; color: var(--navy); }
+    .testi-role { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+
+    /* ─── CTA BANNER ─── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--saffron) 50%, var(--gold) 100%);
+      padding: 80px 5vw;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='white' opacity='0.15'/%3E%3C/svg%3E");
+    }
+    .cta-banner-inner { position: relative; max-width: 650px; margin: 0 auto; }
+    .cta-banner-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 900;
+      color: white;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .cta-banner-desc { color: rgba(255,255,255,0.85); font-size: 1rem; margin-bottom: 36px; line-height: 1.65; }
+    .cta-banner-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-white {
+      padding: 14px 28px;
+      background: white;
+      color: var(--saffron-dark);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .btn-white-outline {
+      padding: 14px 28px;
+      background: transparent;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 2px solid rgba(255,255,255,0.6);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-white-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--navy);
+      padding: 64px 5vw 32px;
+      color: rgba(255,255,255,0.6);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-bottom: 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+    .footer-brand-name span { color: var(--gold-light); }
+    .footer-brand-desc { font-size: 0.85rem; line-height: 1.7; margin-bottom: 24px; }
+    .footer-contact a {
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .footer-contact a:hover { color: var(--gold-light); }
+
+    .footer-col-title {
+      font-weight: 600;
+      color: var(--white);
+      font-size: 0.875rem;
+      margin-bottom: 20px;
+      letter-spacing: 0.04em;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 12px; }
+    .footer-links a {
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 28px auto 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-bottom-links a:hover { color: var(--gold-light); }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-cards { flex-direction: row; flex-wrap: wrap; }
+      .path-card { flex: 1 1 250px; }
+      .hiw-steps { grid-template-columns: 1fr; }
+      .pricing-cards { grid-template-columns: 1fr; }
+      .subject-grid { grid-template-columns: repeat(2, 1fr); }
+      .why-inner { grid-template-columns: 1fr; }
+      .why-float-stat { position: static; margin-top: 20px; display: inline-block; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .subjects-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { flex-wrap: wrap; gap: 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
+      .subject-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── INQUIRY FORM MODAL ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 520px;
+      width: 100%;
+      transform: scale(0.95) translateY(20px);
+      transition: transform 0.3s;
+      position: relative;
+    }
+    .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px;
+      border: none; background: rgba(15,30,60,0.08);
+      border-radius: 50%; cursor: pointer;
+      font-size: 1rem; color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .modal-sub { font-size: 0.875rem; color: var(--text-light); margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block; font-size: 0.8rem; font-weight: 600;
+      color: var(--navy); margin-bottom: 6px; letter-spacing: 0.03em;
+    }
+    .form-input, .form-select {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid rgba(15,30,60,0.12);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--saffron); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-submit {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      border: none; border-radius: 8px;
+      color: white; font-weight: 700;
+      font-size: 0.95rem; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 8px;
+      transition: all 0.25s;
+    }
+    .modal-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,117,26,0.4); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .hamburger span {
+      width: 22px; height: 2px;
+      background: white;
+      border-radius: 2px;
+      display: block;
+    }
+    @media (max-width: 900px) { .hamburger { display: flex; } }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">🎓</div>
+    <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#subjects">Subjects</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn-nav btn-nav-outline" onclick="openModal('student')">Post Inquiry</a>
+    <a href="#" class="btn-nav btn-nav-fill" onclick="openModal('teacher')">Register as Tutor</a>
+  </div>
+  <div class="hamburger" onclick="this.classList.toggle('active')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-left fade-in">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span>Delhi's Most Trusted Tuition Platform</span>
+      </div>
+      <h1 class="hero-title">
+        Find the <span class="accent">Perfect Tutor</span><br>
+        Right at Your Doorstep
+      </h1>
+      <p class="hero-desc">
+        Delhi Private Tutors connects students with qualified, verified home tutors across all subjects and boards — from Class 1 to competitive exams. Students post free; tutors pay just ₹1,000/month.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary" onclick="openModal('student')">
+          📋 Post Tuition Inquiry — Free
+        </a>
+        <a href="#pricing" class="btn-secondary">
+          📚 I'm a Tutor →
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">2,500+</div>
+          <div class="stat-label">Active Tutors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8,000+</div>
+          <div class="stat-label">Happy Students</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Subjects Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">4.9★</div>
+          <div class="stat-label">Avg. Rating</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-cards fade-in" style="transition-delay:0.2s">
+      <div class="path-card" onclick="openModal('student')">
+        <span class="path-card-icon">👨‍🎓</span>
+        <div class="path-card-title">I Need a Home Tutor</div>
+        <div class="path-card-desc">Post your tuition requirement in minutes. Share your class, subjects, preferred timing, and location — our tutors will reach out to you directly.</div>
+        <span class="path-card-tag tag-free">✓ Completely Free</span>
+      </div>
+      <div class="path-card" onclick="openModal('teacher')">
+        <span class="path-card-icon">👩‍🏫</span>
+        <div class="path-card-title">I'm a Home Tutor</div>
+        <div class="path-card-desc">Register on our platform and get access to verified student inquiries in your preferred areas of Delhi. Build a strong client base with ease.</div>
+        <span class="path-card-tag tag-pro">₹1,000 / month</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="hiw" id="how-it-works">
+  <div class="hiw-inner">
+    <div class="hiw-header fade-in">
+      <div class="section-tag">Simple Process</div>
+      <h2 class="section-title">How It <span class="italic">Works</span></h2>
+      <p class="section-desc">Getting started is quick and straightforward — whether you are a student or a tutor.</p>
+    </div>
+
+    <div class="hiw-tabs">
+      <button class="hiw-tab active" onclick="switchTab('student', this)">For Students</button>
+      <button class="hiw-tab" onclick="switchTab('teacher', this)">For Tutors</button>
+    </div>
+
+    <div id="student-steps" class="hiw-steps">
+      <div class="step-card fade-in">
+        <div class="step-num">01</div>
+        <span class="step-icon">📝</span>
+        <div class="step-title">Post Your Requirement</div>
+        <p class="step-text">Fill a simple form with your class, subjects, preferred location in Delhi, and available timings. Completely free — no registration fees.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.1s">
+        <div class="step-num">02</div>
+        <span class="step-icon">📞</span>
+        <div class="step-title">Get Contacted by Tutors</div>
+        <p class="step-text">Verified and qualified tutors from your area will review your inquiry and reach out to you via phone or WhatsApp directly.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.2s">
+        <div class="step-num">03</div>
+        <span class="step-icon">🏠</span>
+        <div class="step-title">Start Learning at Home</div>
+        <p class="step-text">Choose the tutor that best fits your needs, fix the schedule, and begin personalized home tuition sessions from the comfort of your home.</p>
+      </div>
+    </div>
+
+    <div id="teacher-steps" class="hiw-steps" style="display:none">
+      <div class="step-card fade-in">
+        <div class="step-num">01</div>
+        <span class="step-icon">🎓</span>
+        <div class="step-title">Register Your Profile</div>
+        <p class="step-text">Sign up by filling your qualifications, subjects you teach, preferred areas in Delhi, and teaching experience. Pay ₹1,000/month to activate.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.1s">
+        <div class="step-num">02</div>
+        <span class="step-icon">🔍</span>
+        <div class="step-title">Browse Student Inquiries</div>
+        <p class="step-text">Access a curated feed of student tuition inquiries matching your subjects and preferred locations. Contact students who are the right fit.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.2s">
+        <div class="step-num">03</div>
+        <span class="step-icon">💰</span>
+        <div class="step-title">Grow Your Tutoring Business</div>
+        <p class="step-text">Build a steady student base, earn consistently, and grow your reputation as a top home tutor in Delhi through our trusted platform.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header fade-in">
+      <div class="section-tag" style="color:var(--gold-light)">Transparent Pricing</div>
+      <h2 class="section-title">Simple, Fair <span class="italic" style="color:var(--gold-light)">Pricing</span></h2>
+      <p class="section-desc">Students always join free. Tutors invest a small monthly fee to access genuine, verified student leads.</p>
+    </div>
+    <div class="pricing-cards">
+      <div class="price-card price-card-student fade-in">
+        <span class="price-icon">👨‍🎓</span>
+        <div class="price-title">For Students & Parents</div>
+        <div class="price-sub">Post your tuition requirement with zero cost</div>
+        <div class="price-amount">
+          <div class="price-num">₹0</div>
+          <div class="price-per">Forever Free</div>
+        </div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Post unlimited tuition inquiries</li>
+          <li><span class="check">✓</span> Get contacted by verified tutors</li>
+          <li><span class="check">✓</span> Access tutors across all Delhi areas</li>
+          <li><span class="check">✓</span> All subjects & all boards (CBSE/ICSE/State)</li>
+          <li><span class="check">✓</span> No hidden charges — ever</li>
+          <li><span class="check">✓</span> WhatsApp & phone support</li>
+        </ul>
+        <a href="#" class="btn-card-student" onclick="openModal('student')">Post Tuition Requirement →</a>
+      </div>
+      <div class="price-card price-card-teacher fade-in" style="transition-delay:0.15s">
+        <span class="price-icon">👩‍🏫</span>
+        <div class="price-title">For Home Tutors</div>
+        <div class="price-sub">Get access to genuine student leads in Delhi</div>
+        <div class="price-amount">
+          <div class="price-num">₹1,000</div>
+          <div class="price-per">per month · Cancel anytime</div>
+        </div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Access to all student inquiries in your area</li>
+          <li><span class="check">✓</span> Verified teacher badge on your profile</li>
+          <li><span class="check">✓</span> Dedicated profile listing for students to find you</li>
+          <li><span class="check">✓</span> Priority placement in search results</li>
+          <li><span class="check">✓</span> WhatsApp leads delivered daily</li>
+          <li><span class="check">✓</span> No commission on earnings — keep 100%</li>
+        </ul>
+        <a href="#" class="btn-card-teacher" onclick="openModal('teacher')">Register as Tutor — ₹1,000/mo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUBJECTS ── -->
+<section class="subjects" id="subjects">
+  <div class="subjects-inner">
+    <div class="subjects-header fade-in">
+      <div>
+        <div class="section-tag">What We Cover</div>
+        <h2 class="section-title">All Subjects, <span class="italic">All Classes</span></h2>
+      </div>
+      <p class="section-desc">From primary school basics to IIT-JEE and NEET preparation — we have tutors for every need.</p>
+    </div>
+    <div class="subject-grid">
+      <div class="subject-card fade-in"><span class="subject-icon">➕</span><div class="subject-name">Mathematics</div><div class="subject-level">Class 1–12, IIT-JEE</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.05s"><span class="subject-icon">🔬</span><div class="subject-name">Physics</div><div class="subject-level">Class 9–12, JEE/NEET</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.1s"><span class="subject-icon">⚗️</span><div class="subject-name">Chemistry</div><div class="subject-level">Class 9–12, JEE/NEET</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.15s"><span class="subject-icon">🧬</span><div class="subject-name">Biology</div><div class="subject-level">Class 9–12, NEET</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.2s"><span class="subject-icon">📖</span><div class="subject-name">English</div><div class="subject-level">All Classes</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.25s"><span class="subject-icon">🇮🇳</span><div class="subject-name">Hindi</div><div class="subject-level">All Classes</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.3s"><span class="subject-icon">📊</span><div class="subject-name">Accountancy</div><div class="subject-level">Class 11–12, CA</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.35s"><span class="subject-icon">💻</span><div class="subject-name">Computer Science</div><div class="subject-level">Class 9–12, BCA</div></div>
+      <div class="subject-card fade-in"><span class="subject-icon">📈</span><div class="subject-name">Economics</div><div class="subject-level">Class 11–12</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.05s"><span class="subject-icon">🗺️</span><div class="subject-name">Social Science</div><div class="subject-level">Class 6–10</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.1s"><span class="subject-icon">🎨</span><div class="subject-name">Drawing & Arts</div><div class="subject-level">All Classes</div></div>
+      <div class="subject-card fade-in" style="transition-delay:0.15s"><span class="subject-icon">🏆</span><div class="subject-name">Competitive Exams</div><div class="subject-level">SSC, UPSC, CAT &amp; more</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY CHOOSE US ── -->
+<section class="why">
+  <div class="why-inner">
+    <div class="why-visual fade-in">
+      <div class="why-big-card">
+        <div class="why-card-quote">"</div>
+        <div class="why-card-text">
+          My son's Math marks jumped from 55% to 91% within 3 months of finding a tutor through Delhi Private Tutors. The process was so simple and the tutor was fantastic.
+        </div>
+        <div class="why-card-author">
+          <div class="why-avatar">👩</div>
+          <div>
+            <div class="why-author-name">Priya Sharma</div>
+            <div class="why-author-role">Parent · Dwarka, Delhi</div>
+          </div>
+        </div>
+        <div class="why-float-stat">
+          <div class="why-float-num">98%</div>
+          <div class="why-float-label">Satisfaction Rate</div>
+        </div>
+      </div>
+    </div>
+    <div class="why-content fade-in" style="transition-delay:0.2s">
+      <div class="section-tag">Why Choose Us</div>
+      <h2 class="section-title">Delhi's Most <span class="italic">Reliable</span> Tuition Network</h2>
+      <ul class="why-points">
+        <li class="why-point">
+          <div class="why-point-icon">✅</div>
+          <div>
+            <div class="why-point-title">Verified & Background-Checked Tutors</div>
+            <p class="why-point-text">Every tutor on our platform goes through a verification process including qualification check and ID verification before being listed.</p>
+          </div>
+        </li>
+        <li class="why-point">
+          <div class="why-point-icon">📍</div>
+          <div>
+            <div class="why-point-title">Hyperlocal — All Delhi Covered</div>
+            <p class="why-point-text">We serve all major areas — Dwarka, Rohini, Pitampura, Lajpat Nagar, Vasant Kunj, Noida Extension, and beyond.</p>
+          </div>
+        </li>
+        <li class="why-point">
+          <div class="why-point-icon">⚡</div>
+          <div>
+            <div class="why-point-title">Fast Matching — Within 24 Hours</div>
+            <p class="why-point-text">Post your requirement and get connected with a matching tutor in as fast as 24 hours, depending on your location and subject.</p>
+          </div>
+        </li>
+        <li class="why-point">
+          <div class="why-point-icon">🔒</div>
+          <div>
+            <div class="why-point-title">Zero Commission on Tutor Earnings</div>
+            <p class="why-point-text">Tutors keep 100% of what they earn from students. We only charge a flat platform fee — no percentage cuts, ever.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-inner">
+    <div class="testimonials-header fade-in">
+      <div class="section-tag">Success Stories</div>
+      <h2 class="section-title">Loved by Students & <span class="italic">Tutors</span> Alike</h2>
+      <p class="section-desc">Real stories from real people who found success through Delhi Private Tutors.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card fade-in">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I found an excellent Chemistry tutor for my Class 12 boards within 2 days of posting my requirement. My tutor is very patient and explains concepts brilliantly. Highly recommend!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar av1">A</div>
+          <div>
+            <div class="testi-name">Ananya Gupta</div>
+            <div class="testi-role">Class 12 Student · Rohini</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-in" style="transition-delay:0.1s">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"As a tutor, I was struggling to find consistent students. After registering here for just ₹1,000, I got 4 new students in the first week! Best investment for my teaching career."</p>
+        <div class="testi-author">
+          <div class="testi-avatar av2">R</div>
+          <div>
+            <div class="testi-name">Rahul Verma</div>
+            <div class="testi-role">Math & Physics Tutor · Pitampura</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-in" style="transition-delay:0.2s">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Needed an English tutor for my 8-year-old. The process was so simple, free, and quick. The tutor assigned is wonderful and my daughter loves her sessions!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar av3">S</div>
+          <div>
+            <div class="testi-name">Sunita Kapoor</div>
+            <div class="testi-role">Parent · Vasant Kunj</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BANNER ── -->
+<section class="cta-banner">
+  <div class="cta-banner-inner fade-in">
+    <h2 class="cta-banner-title">Ready to Get Started Today?</h2>
+    <p class="cta-banner-desc">Join thousands of students and tutors across Delhi who are already connected through our trusted platform. It takes less than 2 minutes.</p>
+    <div class="cta-banner-btns">
+      <a href="#" class="btn-white" onclick="openModal('student')">📋 Post Free Inquiry</a>
+      <a href="#" class="btn-white-outline" onclick="openModal('teacher')">🎓 Register as Tutor</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Delhi <span>Private</span> Tutors</div>
+      <p class="footer-brand-desc">Delhi's most trusted home tuition platform connecting students with qualified, verified tutors across all areas of Delhi NCR since 2019.</p>
+      <div class="footer-contact">
+        <a href="tel:+919999999999">📞 +91 99999 99999</a>
+        <a href="mailto:info@delhiprivatetutors.in">✉️ info@delhiprivatetutors.in</a>
+        <a href="#">📍 New Delhi, India</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">For Students</div>
+      <ul class="footer-links">
+        <li><a href="#">Post Tuition Inquiry</a></li>
+        <li><a href="#">Find a Tutor</a></li>
+        <li><a href="#">All Subjects</a></li>
+        <li><a href="#">All Delhi Areas</a></li>
+        <li><a href="#">How It Works</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">For Tutors</div>
+      <ul class="footer-links">
+        <li><a href="#">Register as Tutor</a></li>
+        <li><a href="#">Tutor Login</a></li>
+        <li><a href="#">Pricing — ₹1,000/mo</a></li>
+        <li><a href="#">Tutor Benefits</a></li>
+        <li><a href="#">Tutor Guidelines</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div style="font-size:0.78rem">© 2025 Delhi Private Tutors. All rights reserved.</div>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+  /* ── TAB SWITCH ── */
+  function switchTab(type, btn) {
+    document.querySelectorAll('.hiw-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('student-steps').style.display = type === 'student' ? 'grid' : 'none';
+    document.getElementById('teacher-steps').style.display = type === 'teacher' ? 'grid' : 'none';
+  }
+
+  /* ── MODAL ── */
+  function openModal(type) {
+    const modal = document.getElementById('modal');
+    const content = document.getElementById('modal-content');
+
+    if (type === 'student') {
+      content.innerHTML = `
+        <div class="modal-title">Post Your Tuition Inquiry</div>
+        <div class="modal-sub">Fill in the details below — our tutors will contact you within 24 hours. Completely Free!</div>
+        <div class="form-group">
+          <label class="form-label">Your Name *</label>
+          <input class="form-input" type="text" placeholder="Enter your full name" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input class="form-input" type="tel" placeholder="+91 9XXXXXXXXX" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Class / Grade *</label>
+            <select class="form-select">
+              <option value="">Select Class</option>
+              <option>Class 1–5 (Primary)</option>
+              <option>Class 6–8 (Middle)</option>
+              <option>Class 9–10 (Secondary)</option>
+              <option>Class 11–12 (Senior)</option>
+              <option>Competitive Exam Prep</option>
+              <option>Other / College</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject(s) Required *</label>
+          <input class="form-input" type="text" placeholder="e.g. Mathematics, Physics, English" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Area in Delhi *</label>
+            <input class="form-input" type="text" placeholder="e.g. Rohini, Dwarka" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred Timing</label>
+            <select class="form-select">
+              <option value="">Any Time</option>
+              <option>Morning (6–9 AM)</option>
+              <option>Afternoon (12–4 PM)</option>
+              <option>Evening (5–8 PM)</option>
+              <option>Night (8–10 PM)</option>
+              <option>Flexible</option>
+            </select>
+          </div>
+        </div>
+        <button class="modal-submit" onclick="submitForm('student')">Submit Free Inquiry →</button>
+      `;
+    } else {
+      content.innerHTML = `
+        <div class="modal-title">Register as a Home Tutor</div>
+        <div class="modal-sub">Join 2,500+ verified tutors. Pay ₹1,000/month and access genuine student leads daily.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input class="form-input" type="text" placeholder="Your full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input class="form-input" type="tel" placeholder="+91 9XXXXXXXXX" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Highest Qualification *</label>
+          <select class="form-select">
+            <option value="">Select Qualification</option>
+            <option>B.Sc / B.A / B.Com</option>
+            <option>B.Tech / B.E</option>
+            <option>M.Sc / M.A / M.Com</option>
+            <option>M.Tech / M.E</option>
+            <option>B.Ed / M.Ed</option>
+            <option>PhD</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subjects You Teach *</label>
+          <input class="form-input" type="text" placeholder="e.g. Math, Physics, Chemistry" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Preferred Area *</label>
+            <input class="form-input" type="text" placeholder="e.g. Dwarka, Rohini" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Experience (Years)</label>
+            <select class="form-select">
+              <option>Less than 1 year</option>
+              <option>1–3 years</option>
+              <option>3–5 years</option>
+              <option>5–10 years</option>
+              <option>10+ years</option>
+            </select>
+          </div>
+        </div>
+        <button class="modal-submit" onclick="submitForm('teacher')">Register & Pay ₹1,000 →</button>
+      `;
+    }
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  function submitForm(type) {
+    const modal = document.getElementById('modal');
+    const content = document.getElementById('modal-content');
+    const msg = type === 'student'
+      ? '🎉 Your tuition inquiry has been posted successfully! Our tutors in your area will contact you within 24 hours.'
+      : '🎉 Thank you for registering! Our team will verify your profile and contact you with payment details within 24 hours.';
+    content.innerHTML = `
+      <div style="text-align:center; padding: 24px 0;">
+        <div style="font-size:3.5rem; margin-bottom:20px;">✅</div>
+        <div class="modal-title" style="margin-bottom:12px">Submitted Successfully!</div>
+        <p style="color:var(--text-light); font-size:0.9rem; line-height:1.7; margin-bottom:28px">${msg}</p>
+        <button class="modal-submit" onclick="closeModal()" style="margin-top:0">Close</button>
+      </div>
+    `;
+  }
+
+  /* ── SCROLL ANIMATIONS ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
