@@ -677,7 +677,7 @@
     <!-- RIGHT — Form Panel -->
     <div class="login-form-panel">
       <!-- Role Selector -->
-      <div class="role-selector">
+      <div class="role-selector" style="display: none;">
         <button class="role-btn active" id="role-student">
           <div class="role-btn-icon"><i data-lucide="book-open"></i></div>
           <div class="role-btn-label">I'm a Student / Parent</div>
@@ -773,7 +773,7 @@
       </button>
 
       <div class="form-footer" id="form-footer">
-        Don't have an account? <a href="#" onclick="switchMode('signup'); return false;">Create one now</a>
+        Don't have an account? <a href="/signup">Create one now</a>
       </div>
     </div>
   </div>
@@ -987,18 +987,24 @@
   });
 
   /* ══════════════════════════════════════
-     URL PARAMS → PRE-SELECT ROLE & MODE
+     ROUTE-BASED MODE DETECTION
      ══════════════════════════════════════ */
 
   (function() {
     const params = new URLSearchParams(window.location.search);
     const role = params.get('role');
-    const mode = params.get('mode');
+    const modeParam = params.get('mode');
+    const pathname = window.location.pathname;
+    
+    // Route-based UI control exactly equivalent to useLocation()
+    if (pathname.includes('/signup') || modeParam === 'signup') {
+      currentMode = 'signup';
+    } else {
+      currentMode = 'login';
+    }
+
     if (role === 'tutor') {
       currentRole = 'tutor';
-    }
-    if (mode === 'signup') {
-      currentMode = 'signup';
     }
   })();
 
@@ -1020,32 +1026,34 @@
   window.selectRole = selectRole;
 
   /* ══════════════════════════════════════
-     MODE SWITCH
+     ROUTE-BASED UI INITIALIZATION
      ══════════════════════════════════════ */
 
-  function switchMode(mode) {
-    currentMode = mode;
+  function initializeRouteUI() {
+    const isSignup = currentMode === 'signup';
+    
     const loginBtn = document.getElementById('mode-login');
     const signupBtn = document.getElementById('mode-signup');
-    if (loginBtn) loginBtn.classList.toggle('active', mode === 'login');
-    if (signupBtn) signupBtn.classList.toggle('active', mode === 'signup');
+    if (loginBtn) loginBtn.classList.toggle('active', !isSignup);
+    if (signupBtn) signupBtn.classList.toggle('active', isSignup);
 
     const signupFields = document.querySelectorAll('.signup-fields');
-    signupFields.forEach(f => f.classList.toggle('visible', mode === 'signup'));
+    signupFields.forEach(f => f.classList.toggle('visible', isSignup));
 
+    // Conditionally render header options ONLY when pathname === "/signup"
     const roleSelector = document.querySelector('.role-selector');
     if (roleSelector) {
-      roleSelector.style.display = mode === 'signup' ? 'flex' : 'none';
+      roleSelector.style.display = isSignup ? 'grid' : 'none';
     }
 
     const loginExtras = document.getElementById('login-extras');
-    if (loginExtras) loginExtras.style.display = mode === 'login' ? 'flex' : 'none';
+    if (loginExtras) loginExtras.style.display = !isSignup ? 'flex' : 'none';
 
     hideError();
     hideVerificationBanner();
     updateUI();
   }
-  window.switchMode = switchMode;
+  window.initializeRouteUI = initializeRouteUI;
 
   /* ══════════════════════════════════════
      UPDATE UI LABELS
@@ -1062,7 +1070,7 @@
     if (currentMode === 'login') {
       if (heading) heading.textContent = 'Welcome back';
       if (submitText) submitText.textContent = 'Sign In';
-      if (footer) footer.innerHTML = 'Don\'t have an account? <a href="#" onclick="switchMode(\'signup\'); return false;">Create one now</a>';
+      if (footer) footer.innerHTML = 'Don\'t have an account? <a href="/signup">Create one now</a>';
 
       if (currentRole === 'student') {
         if (subheading) subheading.textContent = 'Sign in to find the right tutor for your needs';
@@ -1071,7 +1079,7 @@
       }
     } else {
       if (submitText) submitText.textContent = 'Create Account';
-      if (footer) footer.innerHTML = 'Already have an account? <a href="#" onclick="switchMode(\'login\'); return false;">Sign in</a>';
+      if (footer) footer.innerHTML = 'Already have an account? <a href="/login">Sign in</a>';
 
       if (currentRole === 'student') {
         if (heading) heading.textContent = 'Find the right tutor';
@@ -1308,6 +1316,9 @@
      ══════════════════════════════════════ */
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Initialize UI strictly from route state
+    initializeRouteUI();
+
     // Apply URL param role selection
     if (currentRole === 'tutor') {
       selectRole('tutor');
@@ -1319,11 +1330,12 @@
     const tutorBtn = document.getElementById('role-tutor');
     if (tutorBtn) tutorBtn.addEventListener('click', () => selectRole('tutor'));
 
+    // Route transitions instead of state toggle
     const modeLogin = document.getElementById('mode-login');
-    if (modeLogin) modeLogin.addEventListener('click', () => switchMode('login'));
+    if (modeLogin) modeLogin.addEventListener('click', () => window.location.href = '/login');
 
     const modeSignup = document.getElementById('mode-signup');
-    if (modeSignup) modeSignup.addEventListener('click', () => switchMode('signup'));
+    if (modeSignup) modeSignup.addEventListener('click', () => window.location.href = '/signup');
 
     const authForm = document.getElementById('auth-form');
     if (authForm) {
