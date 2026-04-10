@@ -52,13 +52,7 @@
     .nav-logo {
       display: flex; align-items: center; gap: 10px; text-decoration: none;
     }
-    .nav-logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
+    .logo { height: 45px; width: auto; object-fit: contain; }
     .nav-logo-text {
       font-family: 'Playfair Display', serif;
       font-size: 1.15rem;
@@ -620,13 +614,15 @@
       }
     }
   </style>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="shortcut icon" href="/assets/logo.png">
 </head>
 <body>
 
 <!-- ── NAVIGATION ── -->
 <nav>
   <a class="nav-logo" href="index.html">
-    <div class="nav-logo-icon"><i data-lucide="graduation-cap"></i></div>
+    <img src="/assets/logo.png" alt="Logo" class="logo">
     <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
   </a>
   <a class="nav-back" href="index.html">
@@ -645,9 +641,7 @@
     <!-- LEFT — Branding Panel -->
     <div class="login-branding">
       <div class="branding-content">
-        <div class="branding-icon">
-          <i data-lucide="graduation-cap"></i>
-        </div>
+        <img src="/assets/logo.png" alt="Logo" class="logo" style="height: 64px; margin-bottom: 28px;">
         <h1 class="branding-heading" id="branding-heading">
           Find the <span class="accent">Right Tutor</span>
         </h1>

@@ -40,15 +40,7 @@
       color: white;
     }
     
-    .logo-box {
-      background: var(--saffron);
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .logo { height: 45px; width: auto; object-fit: contain; }
 
     .logo-text h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
     .logo-text span { color: var(--saffron); }
@@ -137,13 +129,13 @@
       z-index: 1000;
     }
   </style>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="shortcut icon" href="/assets/logo.png">
 </head>
 <body>
 
   <div class="brand-header">
-    <div class="logo-box">
-      <i data-lucide="graduation-cap" style="color:var(--navy); width:24px; height:24px;"></i>
-    </div>
+    <img src="/assets/logo.png" alt="Logo" class="logo" style="margin-right: 12px;">
     <div class="logo-text">
       <h1>Delhi <span>Private</span><br>Tutors</h1>
     </div>
