@@ -1,1379 +1,1387 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — Delhi Private Tutors</title>
-  <meta name="description" content="Sign in or create your Delhi Private Tutors account. Students post free tuition inquiries, tutors access verified leads across Delhi." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --saffron: #E8751A;
-      --saffron-light: #F5954A;
-      --saffron-dark: #C25A08;
-      --navy: #0F1E3C;
-      --navy-mid: #1A2F5A;
-      --cream: #FDF8F3;
-      --gold: #C9922A;
-      --gold-light: #F0C060;
-      --text-dark: #1A1208;
-      --text-mid: #4A3820;
-      --text-light: #8A7360;
-      --white: #FFFFFF;
-      --card-bg: #FFFDF9;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--navy);
-      color: var(--text-dark);
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ─── NAVBAR ─── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 5vw;
-      height: 70px;
-      background: rgba(15,30,60,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(200,146,42,0.25);
-    }
-
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
-    }
-    .logo { height: 45px; width: auto; object-fit: contain; }
-    .nav-logo-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.1;
-    }
-    .nav-logo-text span { color: var(--gold-light); }
-
-    .nav-back {
-      display: flex; align-items: center; gap: 8px;
-      color: rgba(255,255,255,0.7);
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: color 0.2s;
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .nav-back:hover { color: var(--gold-light); border-color: rgba(200,146,42,0.4); }
-
-    /* ─── ICONS ─── */
-    [data-lucide] {
-      width: 1em;
-      height: 1em;
-      vertical-align: middle;
-      display: inline-block;
-      stroke-width: 2;
-    }
-
-    /* ─── MAIN LAYOUT ─── */
-    .login-page {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 100px 5vw 60px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Background effects — same as hero */
-    .login-bg {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 75% 40%, rgba(232,117,26,0.12) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(201,146,42,0.08) 0%, transparent 60%),
-        linear-gradient(180deg, #0A1628 0%, #0F1E3C 60%, #0A1628 100%);
-    }
-
-    .login-grid-bg {
-      position: absolute; inset: 0; opacity: 0.04;
-      background-image:
-        linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      animation: floatOrb 8s ease-in-out infinite;
-    }
-    .orb-1 {
-      width: 400px; height: 400px;
-      background: rgba(232,117,26,0.15);
-      top: -100px; right: 10%;
-      animation-delay: 0s;
-    }
-    .orb-2 {
-      width: 300px; height: 300px;
-      background: rgba(201,146,42,0.1);
-      bottom: 5%; left: 5%;
-      animation-delay: 3s;
-    }
-    @keyframes floatOrb {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.05); }
-    }
-
-    /* ─── LOGIN CONTAINER ─── */
-    .login-container {
-      position: relative; z-index: 2;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      max-width: 1000px;
-      width: 100%;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.3);
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── LEFT PANEL (Branding) ─── */
-    .login-branding {
-      background: linear-gradient(145deg, rgba(232,117,26,0.12), rgba(201,146,42,0.06));
-      border-right: 1px solid rgba(255,255,255,0.06);
-      padding: 48px 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .login-branding::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 30% 70%, rgba(232,117,26,0.08), transparent 70%);
-    }
-
-    .branding-content {
-      position: relative; z-index: 1;
-    }
-
-    .branding-icon {
-      width: 56px; height: 56px;
-      background: linear-gradient(135deg, var(--saffron), var(--gold));
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-      color: white;
-      margin-bottom: 28px;
-      box-shadow: 0 8px 32px rgba(232,117,26,0.35);
-    }
-
-    .branding-heading {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.9rem;
-      font-weight: 900;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 14px;
-      transition: all 0.4s ease;
-    }
-    .branding-heading .accent { color: var(--gold-light); font-style: italic; }
-
-    .branding-desc {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.7;
-      margin-bottom: 40px;
-      font-weight: 300;
-      transition: all 0.4s ease;
-    }
-
-    .branding-stats {
-      display: flex; gap: 28px;
-      padding-top: 28px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .branding-stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--gold-light);
-      line-height: 1;
-    }
-    .branding-stat-label {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.5);
-      margin-top: 4px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-    }
-
-    .branding-trust {
-      margin-top: 28px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .branding-trust-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(34,197,94,0.12);
-      border: 1px solid rgba(34,197,94,0.3);
-      padding: 5px 12px;
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #4ade80;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    /* ─── RIGHT PANEL (Form) ─── */
-    .login-form-panel {
-      padding: 48px 40px;
-      background: var(--white);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* ── Role Selector ── */
-    .role-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 28px;
-    }
-    .role-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 16px 12px;
-      border: 2px solid rgba(15,30,60,0.1);
-      border-radius: 12px;
-      background: var(--cream);
-      cursor: pointer;
-      transition: all 0.3s;
-      text-align: center;
-    }
-    .role-btn:hover {
-      border-color: rgba(232,117,26,0.3);
-      background: rgba(232,117,26,0.04);
-    }
-    .role-btn.active {
-      border-color: var(--saffron);
-      background: rgba(232,117,26,0.06);
-      box-shadow: 0 4px 16px rgba(232,117,26,0.12);
-    }
-    .role-btn-icon {
-      font-size: 1.4rem;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      transition: all 0.3s;
-    }
-    .role-btn.active .role-btn-icon {
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      color: white;
-      box-shadow: 0 4px 12px rgba(232,117,26,0.3);
-    }
-    .role-btn:not(.active) .role-btn-icon {
-      background: rgba(15,30,60,0.06);
-      color: var(--navy);
-    }
-    .role-btn-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--navy);
-      letter-spacing: 0.02em;
-    }
-    .role-btn.active .role-btn-label {
-      color: var(--saffron-dark);
-    }
-
-    /* ── Mode Toggle (Login / Signup) ── */
-    .mode-toggle {
-      display: flex;
-      background: var(--cream);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(15,30,60,0.06);
-    }
-    .mode-btn {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      border: none;
-      background: transparent;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-light);
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.25s;
-    }
-    .mode-btn.active {
-      background: var(--white);
-      color: var(--navy);
-      box-shadow: 0 2px 8px rgba(15,30,60,0.08);
-    }
-
-    /* ── Form Heading ── */
-    .form-heading {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
-    .form-subheading {
-      font-size: 0.85rem;
-      color: var(--text-light);
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-
-    /* ── Form Inputs ── */
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--navy);
-      margin-bottom: 6px;
-      letter-spacing: 0.03em;
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid rgba(15,30,60,0.12);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none;
-    }
-    .form-input:focus {
-      border-color: var(--saffron);
-      box-shadow: 0 0 0 3px rgba(232,117,26,0.1);
-    }
-    .form-input::placeholder {
-      color: var(--text-light);
-      font-weight: 400;
-    }
-
-    .password-wrapper {
-      position: relative;
-    }
-    .password-toggle {
-      position: absolute;
-      right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none;
-      cursor: pointer;
-      color: var(--text-light);
-      font-size: 1rem;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-    }
-    .password-toggle:hover { color: var(--navy); }
-
-    .form-extras {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      font-size: 0.78rem;
-    }
-    .remember-me {
-      display: flex; align-items: center; gap: 6px;
-      color: var(--text-mid);
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .remember-me input[type="checkbox"] {
-      accent-color: var(--saffron);
-      width: 14px; height: 14px;
-    }
-    .forgot-link {
-      color: var(--saffron);
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-    .forgot-link:hover { color: var(--saffron-dark); }
-
-    .error-message {
-      background-color: rgba(239, 68, 68, 0.08);
-      color: #df2a2a;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-      display: none;
-      border: 1px solid rgba(239, 68, 68, 0.2);
-    }
-
-    .success-message {
-      background-color: rgba(34, 197, 94, 0.08);
-      color: #16a34a;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-      display: none;
-      border: 1px solid rgba(34, 197, 94, 0.2);
-    }
-
-    .verification-banner {
-      display: none;
-      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-      border: 1px solid #F59E0B;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    .verification-banner .vb-icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-    .verification-banner .vb-heading {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #92400E;
-      margin-bottom: 6px;
-    }
-    .verification-banner .vb-text {
-      font-size: 0.85rem;
-      color: #78350F;
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
-    .verification-banner .btn-resend {
-      padding: 10px 20px;
-      background: #F59E0B;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: background 0.2s;
-    }
-    .verification-banner .btn-resend:hover {
-      background: #D97706;
-    }
-    .verification-banner .btn-resend:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* ── Buttons ── */
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: all 0.25s;
-      box-shadow: 0 4px 24px rgba(232,117,26,0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(232,117,26,0.5);
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin: 20px 0;
-    }
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: rgba(15,30,60,0.1);
-    }
-    .divider-text {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .btn-google {
-      width: 100%;
-      padding: 13px;
-      background: var(--white);
-      border: 1.5px solid rgba(15,30,60,0.12);
-      border-radius: 8px;
-      color: var(--text-dark);
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: all 0.25s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .btn-google:hover {
-      background: var(--cream);
-      border-color: rgba(15,30,60,0.2);
-      box-shadow: 0 4px 12px rgba(15,30,60,0.06);
-    }
-    .btn-google svg {
-      width: 18px; height: 18px;
-      flex-shrink: 0;
-    }
-
-    .form-footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.82rem;
-      color: var(--text-light);
-    }
-    .form-footer a {
-      color: var(--saffron);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .form-footer a:hover { color: var(--saffron-dark); }
-
-    /* ── Signup-only fields ── */
-    .signup-fields {
-      display: none;
-    }
-    .signup-fields.visible {
-      display: block;
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 900px) {
-      .login-container {
-        grid-template-columns: 1fr;
-        max-width: 480px;
-      }
-      .login-branding {
-        display: none;
-      }
-      .login-form-panel {
-        padding: 36px 28px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .login-form-panel {
-        padding: 28px 20px;
-      }
-      .role-selector {
-        gap: 8px;
-      }
-      .role-btn {
-        padding: 12px 8px;
-      }
-    }
-  </style>
-  <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="shortcut icon" href="assets/logo.png">
-</head>
-<body>
-
-<!-- ── NAVIGATION ── -->
-<nav>
-  <a class="nav-logo" href="index.html">
-    <img src="assets/logo.png" alt="Logo" class="logo">
-    <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
-  </a>
-  <a class="nav-back" href="index.html">
-    <i data-lucide="arrow-left"></i> Back to Home
-  </a>
-</nav>
-
-<!-- ── LOGIN PAGE ── -->
-<main class="login-page">
-  <div class="login-bg"></div>
-  <div class="login-grid-bg"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
-  <div class="login-container">
-    <!-- LEFT — Branding Panel -->
-    <div class="login-branding">
-      <div class="branding-content">
-        <img src="assets/logo.png" alt="Logo" class="logo" style="height: 64px; margin-bottom: 28px;">
-        <h1 class="branding-heading" id="branding-heading">
-          Find the <span class="accent">Right Tutor</span>
-        </h1>
-        <p class="branding-desc" id="branding-desc">
-          Post your tuition requirement for free and get connected with verified, qualified home tutors across Delhi within 24 hours.
-        </p>
-        <div class="branding-stats">
-          <div>
-            <div class="branding-stat-num">2,500+</div>
-            <div class="branding-stat-label">Active Tutors</div>
-          </div>
-          <div>
-            <div class="branding-stat-num">8,000+</div>
-            <div class="branding-stat-label">Happy Students</div>
-          </div>
-          <div>
-            <div class="branding-stat-num">4.9★</div>
-            <div class="branding-stat-label">Avg. Rating</div>
-          </div>
-        </div>
-        <div class="branding-trust">
-          <span class="branding-trust-badge"><i data-lucide="shield-check"></i> Verified & Trusted</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT — Form Panel -->
-    <div class="login-form-panel">
-      <!-- Role Selector -->
-      <div class="role-selector" style="display: none;">
-        <button class="role-btn active" id="role-student">
-          <div class="role-btn-icon"><i data-lucide="book-open"></i></div>
-          <div class="role-btn-label">I'm a Student / Parent</div>
-        </button>
-        <button class="role-btn" id="role-tutor">
-          <div class="role-btn-icon"><i data-lucide="presentation"></i></div>
-          <div class="role-btn-label">I'm a Tutor</div>
-        </button>
-      </div>
-
-      <!-- Mode Toggle -->
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="mode-login">Log In</button>
-        <button class="mode-btn" id="mode-signup">Sign Up</button>
-      </div>
-
-      <!-- Dynamic Heading -->
-      <h2 class="form-heading" id="form-heading">Welcome back</h2>
-      <p class="form-subheading" id="form-subheading">Sign in to find the right tutor for your needs</p>
-
-      <div id="error-message" class="error-message"></div>
-      <div id="success-message" class="success-message"></div>
-
-      <!-- Email Verification Banner -->
-      <div id="verification-banner" class="verification-banner">
-        <div class="vb-icon">📧</div>
-        <div class="vb-heading">Please verify your email before continuing</div>
-        <div class="vb-text">Check your inbox for the verification link. Click the link to verify your email, then come back and log in.</div>
-        <button class="btn-resend" id="resend-btn" onclick="resendVerificationEmail()">Resend Verification Email</button>
-      </div>
-
-      <!-- Auth Form -->
-      <form id="auth-form">
-        <!-- Signup-only: Full Name -->
-        <div class="signup-fields" id="signup-fields-name">
-          <div class="form-group">
-            <label class="form-label" for="full-name">Full Name</label>
-            <input class="form-input" type="text" id="full-name" placeholder="Enter your full name" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <input class="form-input" type="email" id="email" placeholder="you@example.com" required />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <div class="password-wrapper">
-            <input class="form-input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
-            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
-              <i data-lucide="eye" id="eye-icon"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Signup-only: Phone -->
-        <div class="signup-fields" id="signup-fields-phone">
-          <div class="form-group">
-            <label class="form-label" for="phone">Phone Number</label>
-            <input class="form-input" type="tel" id="phone" placeholder="+91 9XXXXXXXXX" />
-          </div>
-        </div>
-
-        <!-- Login extras -->
-        <div class="form-extras" id="login-extras">
-          <label class="remember-me">
-            <input type="checkbox" id="remember" /> Remember me
-          </label>
-          <a href="#" class="forgot-link">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn-submit" id="submit-btn">
-          <i data-lucide="log-in"></i>
-          <span id="submit-text">Sign In</span>
-        </button>
-      </form>
-
-      <div class="divider">
-        <div class="divider-line"></div>
-        <span class="divider-text">or</span>
-        <div class="divider-line"></div>
-      </div>
-
-      <button class="btn-google" id="google-btn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 0 0 1.14 12c0 1.62.39 3.16 1.04 4.52l3.66-2.43z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <div class="form-footer" id="form-footer">
-        Don't have an account? <a href="/signup">Create one now</a>
-      </div>
-    </div>
-  </div>
-</main>
-
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-  import { 
-    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-    signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, 
-    sendEmailVerification, signOut, sendPasswordResetEmail,
-    setPersistence, browserLocalPersistence, browserSessionPersistence
-  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-  import { 
-    getFirestore, doc, setDoc, getDoc, serverTimestamp 
-  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",
-    authDomain: "hometutor-2dbc0.firebaseapp.com",
-    projectId: "hometutor-2dbc0",
-    storageBucket: "hometutor-2dbc0.firebasestorage.app",
-    messagingSenderId: "792391008247",
-    appId: "1:792391008247:web:fa9e76a8caa448351d38f2",
-    measurementId: "G-YEJZRFBNDC"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app); 
-  const auth = getAuth(app);
-  
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  /* ══════════════════════════════════════
-     HELPERS
-     ══════════════════════════════════════ */
-
-  function normalizeRole(role) {
-    const r = (role || '').toLowerCase();
-    if (r === 'student' || r === 'parent') return 'student';
-    if (r === 'tutor') return 'tutor';
-    if (r === 'admin') return 'admin';
-    return null;
-  }
-
-  function redirectUser(role) {
-    const r = normalizeRole(role);
-    if (r === 'admin') {
-      window.location.href = 'admin-dashboard.html';
-    } else if (r === 'tutor') {
-      window.location.href = 'tutor-dashboard.html';
-    } else if (r === 'student') {
-      window.location.href = 'student-dashboard.html';
-    } else {
-      window.location.href = 'select-role.html';
-    }
-  }
-
-  function showError(msg) {
-    const errDiv = document.getElementById('error-message');
-    const sucDiv = document.getElementById('success-message');
-    if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; }
-    if (sucDiv) sucDiv.style.display = 'none';
-    hideVerificationBanner();
-  }
-
-  function hideError() {
-    const errDiv = document.getElementById('error-message');
-    if (errDiv) errDiv.style.display = 'none';
-  }
-
-  function showSuccess(msg) {
-    const sucDiv = document.getElementById('success-message');
-    const errDiv = document.getElementById('error-message');
-    if (sucDiv) { sucDiv.textContent = msg; sucDiv.style.display = 'block'; }
-    if (errDiv) errDiv.style.display = 'none';
-  }
-
-  function showVerificationBanner(email) {
-    const banner = document.getElementById('verification-banner');
-    if (banner) {
-      banner.style.display = 'block';
-      const vbText = banner.querySelector('.vb-text');
-      if (vbText && email) {
-        vbText.textContent = `We sent a verification link to ${email}. Check your inbox and spam/junk folder, then come back and log in.`;
-      }
-    }
-  }
-
-  function hideVerificationBanner() {
-    const banner = document.getElementById('verification-banner');
-    if (banner) banner.style.display = 'none';
-  }
-
-  /* ══════════════════════════════════════
-     FIREBASE ERROR MAP
-     ══════════════════════════════════════ */
-
-  const FIREBASE_ERROR_MAP = {
-    'auth/network-request-failed': 'Connection failed. Please check your internet.',
-    'auth/user-not-found': 'No account found with this email.',
-    'auth/wrong-password': 'Incorrect password. Please try again.',
-    'auth/invalid-credential': 'Incorrect email or password. Please try again.',
-    'auth/email-already-in-use': 'This email is already registered.',
-    'auth/weak-password': 'Password is too weak. Please use at least 6 characters.',
-    'auth/too-many-requests': 'Too many failed attempts. Please try again after a few minutes.',
-    'auth/invalid-email': 'Please enter a valid email address.',
-    'auth/user-disabled': 'This account has been disabled. Please contact support.',
-    'auth/popup-blocked': 'Popup blocked. Please allow popups for this site.',
-    'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
-    'auth/requires-recent-login': 'Please log in again to perform this action.',
-    'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
-  };
-
-  function getFriendlyError(error) {
-    if (error && error.code && FIREBASE_ERROR_MAP[error.code]) {
-      return FIREBASE_ERROR_MAP[error.code];
-    }
-    return 'An unexpected error occurred. Please try again.';
-  }
-
-  /* ══════════════════════════════════════
-     STATE
-     ══════════════════════════════════════ */
-
-  let currentRole = 'student';
-  let currentMode = 'login';
-  let signupInProgress = false;
-  let activeLoginAttempt = false;
-
-  const BLOCKED_DOMAINS = [
-    'tempmail.com', '10minutemail.com', 'guerrillamail.com', 
-    'mailinator.com', 'yopmail.com'
-  ];
-
-  function isEmailBlocked(email) {
-    if (!email) return false;
-    const parts = email.split('@');
-    if (parts.length !== 2) return false;
-    const domain = parts[1].toLowerCase();
-    return BLOCKED_DOMAINS.some(blocked => domain.includes(blocked));
-  }
-
-  /* ══════════════════════════════════════
-     PERSISTENT SESSION CHECK
-     ══════════════════════════════════════ */
-
-  let authInitialized = false;
-
-  onAuthStateChanged(auth, async (user) => {
-    authInitialized = true;
-    const mode = currentMode || 'login';
-    const origText = mode === 'login' ? 'Sign In' : 'Create Account';
-
-    if (user) {
-      const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
-
-      if (!isGoogleUser && !user.emailVerified) {
-        setButtonLoading('submit-btn', false, origText, '');
-        return;
-      }
-
-      if (signupInProgress) {
-        return;
-      }
-
-      setButtonLoading('submit-btn', true, origText, 'Checking session...');
-
-      try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        
-        if (userDoc.exists()) {
-          // Check if user is an admin first
-          try {
-            const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-            if (adminDoc.exists() && adminDoc.data().role === 'admin') {
-              window.location.href = 'admin-dashboard.html';
-              return;
-            }
-          } catch(adminErr) { /* Not an admin, continue normally */ }
-
-          const role = userDoc.data().role;
-          if (!role) {
-            window.location.href = 'select-role.html';
-          } else {
-            redirectUser(normalizeRole(role));
-          }
-        } else {
-          if (isEmailBlocked(user.email)) {
-            await user.delete();
-            showError("Temporary email addresses are not allowed. Please use a valid email.");
-            setButtonLoading('submit-btn', false, origText, '');
-            activeLoginAttempt = false;
-            return;
-          }
-
-          try {
-            await setDoc(userDocRef, {
-              role: null,
-              fullName: user.displayName || '',
-              email: user.email,
-              createdAt: serverTimestamp()
-            });
-            window.location.href = 'select-role.html';
-          } catch(dbErr) {
-            showError("Account setup failed. Please try again.");
-            await user.delete().catch(()=>{});
-            await signOut(auth);
-            setButtonLoading('submit-btn', false, origText, '');
-          }
-        }
-      } catch (error) {
-        showError(getFriendlyError(error));
-        setButtonLoading('submit-btn', false, origText, '');
-      }
-    } else {
-      setButtonLoading('submit-btn', false, origText, '');
-    }
-  });
-
-  /* ══════════════════════════════════════
-     ROUTE-BASED MODE DETECTION
-     ══════════════════════════════════════ */
-
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const role = params.get('role');
-    const modeParam = params.get('mode');
-    const pathname = window.location.pathname;
-    
-    // Route-based UI control exactly equivalent to useLocation()
-    if (pathname.includes('/signup') || modeParam === 'signup') {
-      currentMode = 'signup';
-    } else {
-      currentMode = 'login';
-    }
-
-    if (role === 'tutor') {
-      currentRole = 'tutor';
-    }
-  })();
-
-  /* ══════════════════════════════════════
-     ROLE SELECTION
-     ══════════════════════════════════════ */
-
-  function selectRole(role) {
-    currentRole = role;
-    const studentBtn = document.getElementById('role-student');
-    const tutorBtn = document.getElementById('role-tutor');
-    if (studentBtn) studentBtn.classList.toggle('active', role === 'student');
-    if (tutorBtn) tutorBtn.classList.toggle('active', role === 'tutor');
-    hideError();
-    hideVerificationBanner();
-    updateUI();
-    if (window.lucide) lucide.createIcons();
-  }
-  window.selectRole = selectRole;
-
-  /* ══════════════════════════════════════
-     ROUTE-BASED UI INITIALIZATION
-     ══════════════════════════════════════ */
-
-  function initializeRouteUI() {
-    const isSignup = currentMode === 'signup';
-    
-    const loginBtn = document.getElementById('mode-login');
-    const signupBtn = document.getElementById('mode-signup');
-    if (loginBtn) loginBtn.classList.toggle('active', !isSignup);
-    if (signupBtn) signupBtn.classList.toggle('active', isSignup);
-
-    const signupFields = document.querySelectorAll('.signup-fields');
-    signupFields.forEach(f => f.classList.toggle('visible', isSignup));
-
-    // Conditionally render header options ONLY when pathname === "/signup"
-    const roleSelector = document.querySelector('.role-selector');
-    if (roleSelector) {
-      roleSelector.style.display = isSignup ? 'grid' : 'none';
-    }
-
-    const loginExtras = document.getElementById('login-extras');
-    if (loginExtras) loginExtras.style.display = !isSignup ? 'flex' : 'none';
-
-    hideError();
-    hideVerificationBanner();
-    updateUI();
-  }
-  window.initializeRouteUI = initializeRouteUI;
-
-  /* ══════════════════════════════════════
-     UPDATE UI LABELS
-     ══════════════════════════════════════ */
-
-  function updateUI() {
-    const heading = document.getElementById('form-heading');
-    const subheading = document.getElementById('form-subheading');
-    const submitText = document.getElementById('submit-text');
-    const footer = document.getElementById('form-footer');
-    const brandingHeading = document.getElementById('branding-heading');
-    const brandingDesc = document.getElementById('branding-desc');
-
-    if (currentMode === 'login') {
-      if (heading) heading.textContent = 'Welcome back';
-      if (submitText) submitText.textContent = 'Sign In';
-      if (footer) footer.innerHTML = 'Don\'t have an account? <a href="/signup">Create one now</a>';
-
-      if (currentRole === 'student') {
-        if (subheading) subheading.textContent = 'Sign in to find the right tutor for your needs';
-      } else {
-        if (subheading) subheading.textContent = 'Sign in to access student leads and grow your business';
-      }
-    } else {
-      if (submitText) submitText.textContent = 'Create Account';
-      if (footer) footer.innerHTML = 'Already have an account? <a href="/login">Sign in</a>';
-
-      if (currentRole === 'student') {
-        if (heading) heading.textContent = 'Find the right tutor';
-        if (subheading) subheading.textContent = 'Create your account to post tuition inquiries for free';
-      } else {
-        if (heading) heading.textContent = 'Start getting tuition leads';
-        if (subheading) subheading.textContent = 'Create your tutor account and start receiving student leads';
-      }
-    }
-
-    if (currentRole === 'student') {
-      if (brandingHeading) brandingHeading.innerHTML = 'Find the <span class="accent">Right Tutor</span>';
-      if (brandingDesc) brandingDesc.textContent = 'Post your tuition requirement for free and get connected with verified, qualified home tutors across Delhi within 24 hours.';
-    } else {
-      if (brandingHeading) brandingHeading.innerHTML = 'Start Getting <span class="accent">Tuition Leads</span>';
-      if (brandingDesc) brandingDesc.textContent = 'Register as a verified tutor today. Get daily student leads in your area and build a strong, consistent income from tutoring.';
-    }
-  }
-
-  /* ══════════════════════════════════════
-     PASSWORD TOGGLE
-     ══════════════════════════════════════ */
-
-  function togglePassword() {
-    const pw = document.getElementById('password');
-    const iconEl = document.getElementById('eye-icon');
-    if (pw.type === 'password') {
-      pw.type = 'text';
-      iconEl.outerHTML = '<i data-lucide="eye-off" id="eye-icon"></i>';
-    } else {
-      pw.type = 'password';
-      iconEl.outerHTML = '<i data-lucide="eye" id="eye-icon"></i>';
-    }
-    if (window.lucide) lucide.createIcons();
-  }
-  window.togglePassword = togglePassword;
-
-  /* ══════════════════════════════════════
-     BUTTON LOADING STATE
-     ══════════════════════════════════════ */
-
-  function setButtonLoading(btnId, isLoading, originalText, loadingText) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    if (isLoading) {
-      if (btnId === 'submit-btn') {
-        document.getElementById('submit-text').textContent = loadingText;
-      } else {
-        btn.innerHTML = loadingText;
-      }
-      btn.style.pointerEvents = 'none';
-      btn.style.opacity = '0.7';
-    } else {
-      if (btnId === 'submit-btn') {
-        document.getElementById('submit-text').textContent = originalText;
-      } else {
-        btn.innerHTML = originalText;
-      }
-      btn.style.pointerEvents = '';
-      btn.style.opacity = '';
-    }
-  }
-
-  /* ══════════════════════════════════════
-     RESEND VERIFICATION EMAIL
-     ══════════════════════════════════════ */
-
-  async function resendVerificationEmail() {
-    const btn = document.getElementById('resend-btn');
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-    try {
-      let user = auth.currentUser;
-      if (!user) {
-        showError('No user session found. Please sign up or log in first.');
-        return;
-      }
-      await sendEmailVerification(user);
-      showSuccess('Verification email sent! Check your inbox and spam folder.');
-    } catch (error) {
-      if (error.code === 'auth/too-many-requests') {
-        showError('Too many requests. Please wait a few minutes before trying again.');
-      } else {
-        showError(getFriendlyError(error));
-      }
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Resend Verification Email';
-    }
-  }
-  window.resendVerificationEmail = resendVerificationEmail;
-
-  /* ══════════════════════════════════════
-     FORGOT PASSWORD
-     ══════════════════════════════════════ */
-
-  async function handleForgotPassword(e) {
-    if (e) e.preventDefault();
-    hideError();
-    const emailInput = document.getElementById('email');
-    const email = emailInput ? emailInput.value.trim() : '';
-    if (!email) {
-      showError('Please enter your email address above, then click "Forgot password?"');
-      return;
-    }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      showSuccess('A password reset link has been sent to your email.');
-    } catch (error) {
-      showError(getFriendlyError(error));
-    }
-  }
-  window.handleForgotPassword = handleForgotPassword;
-
-  /* ══════════════════════════════════════
-     FORM SUBMIT (LOGIN & SIGNUP)
-     ══════════════════════════════════════ */
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    hideError();
-    hideVerificationBanner();
-
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const role = currentRole;
-    const mode = currentMode;
-
-    const btnId = 'submit-btn';
-    const origText = mode === 'login' ? 'Sign In' : 'Create Account';
-    const loadText = mode === 'login' ? 'Signing in...' : 'Creating account...';
-
-    setButtonLoading(btnId, true, origText, loadText);
-
-    try {
-      if (mode === 'login') {
-        const rememberMe = document.getElementById('remember').checked;
-        try {
-          await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-        } catch(persistErr) {}
-
-        const loginCred = await signInWithEmailAndPassword(auth, email, password);
-        const loginUser = loginCred.user;
-
-        const isGoogle = loginUser.providerData.some(p => p.providerId === 'google.com');
-        if (!isGoogle && !loginUser.emailVerified) {
-          showVerificationBanner(email);
-          setButtonLoading(btnId, false, origText, loadText);
-          return;
-        }
-      } else {
-        if (isEmailBlocked(email)) {
-          showError("Temporary email addresses are not allowed. Please use a valid email.");
-          setButtonLoading(btnId, false, origText, loadText);
-          return;
-        }
-
-        const fullName = document.getElementById('full-name').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-
-        signupInProgress = true;
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        const userData = {
-          role: role,
-          fullName: fullName,
-          email: email,
-          phone: phone,
-          createdAt: serverTimestamp()
-        };
-
-        // Add tutor-specific status fields
-        if (role === 'tutor') {
-          userData.status = 'pending';
-          userData.submittedAt = serverTimestamp();
-          userData.rejectionReason = null;
-          userData.reviewedAt = null;
-          userData.profileImageUrl = null;
-          userData.documentUrl = null;
-        }
-
-        await setDoc(doc(db, 'users', user.uid), userData);
-
-        try { await sendEmailVerification(user); } catch (verifyErr) {}
-
-        sessionStorage.setItem('verifyEmail', email);
-        sessionStorage.setItem('pendingVerification', 'true');
-
-        setButtonLoading(btnId, false, origText, loadText);
-        signupInProgress = false;
-        window.location.href = 'verify-email.html';
-        return;
-      }
-    } catch (error) {
-      signupInProgress = false;
-      showError(getFriendlyError(error));
-      setButtonLoading(btnId, false, origText, loadText);
-    }
-  }
-  window.handleSubmit = handleSubmit;
-
-  /* ══════════════════════════════════════
-     GOOGLE AUTH
-     ══════════════════════════════════════ */
-
-  const GOOGLE_BTN_ORIGINAL_HTML = `
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 0 0 1.14 12c0 1.62.39 3.16 1.04 4.52l3.66-2.43z" fill="#FBBC05"/>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-    </svg>
-    Continue with Google
-  `;
-
-  async function handleGoogleAuth() {
-    activeLoginAttempt = true;
-    const popupPromise = signInWithPopup(auth, provider);
-    setButtonLoading('google-btn', true, GOOGLE_BTN_ORIGINAL_HTML, 'Connecting...');
-    hideError();
-
-    try {
-      await popupPromise;
-    } catch (error) {
-      if (error.code === 'auth/popup-blocked') {
-        showError("Popup blocked. Redirecting to Google login...");
-        try {
-          await signInWithRedirect(auth, provider);
-        } catch(redirectErr) {
-          showError("Could not connect to Google. Please try again.");
-        }
-        return; // Redirect will navigate user away
-      }
-
-      if (error.code !== 'auth/popup-closed-by-user') {
-        showError(error.message);
-      }
-      setButtonLoading(btnId, false, originalHtml, '');
-    }
-  }
-  window.handleGoogleAuth = handleGoogleAuth;
-
-  /* ══════════════════════════════════════
-     DOM READY — ATTACH EVENT LISTENERS
-     ══════════════════════════════════════ */
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Initialize UI strictly from route state
-    initializeRouteUI();
-
-    // Apply URL param role selection
-    if (currentRole === 'tutor') {
-      selectRole('tutor');
-    }
-
-    const studentBtn = document.getElementById('role-student');
-    if (studentBtn) studentBtn.addEventListener('click', () => selectRole('student'));
-
-    const tutorBtn = document.getElementById('role-tutor');
-    if (tutorBtn) tutorBtn.addEventListener('click', () => selectRole('tutor'));
-
-    // Route transitions instead of state toggle
-    const modeLogin = document.getElementById('mode-login');
-    if (modeLogin) modeLogin.addEventListener('click', () => window.location.href = '/login');
-
-    const modeSignup = document.getElementById('mode-signup');
-    if (modeSignup) modeSignup.addEventListener('click', () => window.location.href = '/signup');
-
-    const authForm = document.getElementById('auth-form');
-    if (authForm) {
-      authForm.addEventListener('submit', handleSubmit);
-    }
-
-    const pwToggle = document.querySelector('.password-toggle');
-    if (pwToggle) pwToggle.addEventListener('click', togglePassword);
-
-    const googleBtn = document.getElementById('google-btn');
-    if (googleBtn) googleBtn.addEventListener('click', handleGoogleAuth);
-
-    // BUG 23: Forgot password link
-    const forgotLink = document.querySelector('.forgot-link');
-    if (forgotLink) forgotLink.addEventListener('click', handleForgotPassword);
-  });
-</script>
-
-<!-- ── LUCIDE ICONS ── -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>lucide.createIcons();</script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Delhi Private Tutors</title>
+  <meta name="description" content="Sign in or create your Delhi Private Tutors account. Students post free tuition inquiries, tutors access verified leads across Delhi." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --saffron: #E8751A;
+      --saffron-light: #F5954A;
+      --saffron-dark: #C25A08;
+      --navy: #0F1E3C;
+      --navy-mid: #1A2F5A;
+      --cream: #FDF8F3;
+      --gold: #C9922A;
+      --gold-light: #F0C060;
+      --text-dark: #1A1208;
+      --text-mid: #4A3820;
+      --text-light: #8A7360;
+      --white: #FFFFFF;
+      --card-bg: #FFFDF9;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 70px;
+      background: rgba(15,30,60,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,146,42,0.25);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .logo { height: 45px; width: auto; object-fit: contain; }
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .nav-logo-text span { color: var(--gold-light); }
+
+    .nav-back {
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .nav-back:hover { color: var(--gold-light); border-color: rgba(200,146,42,0.4); }
+
+    /* ─── ICONS ─── */
+    [data-lucide] {
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+      display: inline-block;
+      stroke-width: 2;
+    }
+
+    /* ─── MAIN LAYOUT ─── */
+    .login-page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 5vw 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background effects — same as hero */
+    .login-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 40%, rgba(232,117,26,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(201,146,42,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #0A1628 0%, #0F1E3C 60%, #0A1628 100%);
+    }
+
+    .login-grid-bg {
+      position: absolute; inset: 0; opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: rgba(232,117,26,0.15);
+      top: -100px; right: 10%;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: rgba(201,146,42,0.1);
+      bottom: 5%; left: 5%;
+      animation-delay: 3s;
+    }
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* ─── LOGIN CONTAINER ─── */
+    .login-container {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 1000px;
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── LEFT PANEL (Branding) ─── */
+    .login-branding {
+      background: linear-gradient(145deg, rgba(232,117,26,0.12), rgba(201,146,42,0.06));
+      border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-branding::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 30% 70%, rgba(232,117,26,0.08), transparent 70%);
+    }
+
+    .branding-content {
+      position: relative; z-index: 1;
+    }
+
+    .branding-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      color: white;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(232,117,26,0.35);
+    }
+
+    .branding-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 14px;
+      transition: all 0.4s ease;
+    }
+    .branding-heading .accent { color: var(--gold-light); font-style: italic; }
+
+    .branding-desc {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      font-weight: 300;
+      transition: all 0.4s ease;
+    }
+
+    .branding-stats {
+      display: flex; gap: 28px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .branding-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .branding-stat-label {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .branding-trust {
+      margin-top: 28px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .branding-trust-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #4ade80;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ─── RIGHT PANEL (Form) ─── */
+    .login-form-panel {
+      padding: 48px 40px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ── Role Selector ── */
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .role-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px 12px;
+      border: 2px solid rgba(15,30,60,0.1);
+      border-radius: 12px;
+      background: var(--cream);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .role-btn:hover {
+      border-color: rgba(232,117,26,0.3);
+      background: rgba(232,117,26,0.04);
+    }
+    .role-btn.active {
+      border-color: var(--saffron);
+      background: rgba(232,117,26,0.06);
+      box-shadow: 0 4px 16px rgba(232,117,26,0.12);
+    }
+    .role-btn-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    .role-btn.active .role-btn-icon {
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white;
+      box-shadow: 0 4px 12px rgba(232,117,26,0.3);
+    }
+    .role-btn:not(.active) .role-btn-icon {
+      background: rgba(15,30,60,0.06);
+      color: var(--navy);
+    }
+    .role-btn-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .role-btn.active .role-btn-label {
+      color: var(--saffron-dark);
+    }
+
+    /* ── Mode Toggle (Login / Signup) ── */
+    .mode-toggle {
+      display: flex;
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(15,30,60,0.06);
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border: none;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.25s;
+    }
+    .mode-btn.active {
+      background: var(--white);
+      color: var(--navy);
+      box-shadow: 0 2px 8px rgba(15,30,60,0.08);
+    }
+
+    /* ── Form Heading ── */
+    .form-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .form-subheading {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── Form Inputs ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(15,30,60,0.12);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--saffron);
+      box-shadow: 0 0 0 3px rgba(232,117,26,0.1);
+    }
+    .form-input::placeholder {
+      color: var(--text-light);
+      font-weight: 400;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 1rem;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .password-toggle:hover { color: var(--navy); }
+
+    .form-extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.78rem;
+    }
+    .remember-me {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-mid);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .remember-me input[type="checkbox"] {
+      accent-color: var(--saffron);
+      width: 14px; height: 14px;
+    }
+    .forgot-link {
+      color: var(--saffron);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--saffron-dark); }
+
+    .error-message {
+      background-color: rgba(239, 68, 68, 0.08);
+      color: #df2a2a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .success-message {
+      background-color: rgba(34, 197, 94, 0.08);
+      color: #16a34a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .verification-banner {
+      display: none;
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+      border: 1px solid #F59E0B;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .verification-banner .vb-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .verification-banner .vb-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #92400E;
+      margin-bottom: 6px;
+    }
+    .verification-banner .vb-text {
+      font-size: 0.85rem;
+      color: #78350F;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .verification-banner .btn-resend {
+      padding: 10px 20px;
+      background: #F59E0B;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s;
+    }
+    .verification-banner .btn-resend:hover {
+      background: #D97706;
+    }
+    .verification-banner .btn-resend:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ── Buttons ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(232,117,26,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232,117,26,0.5);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(15,30,60,0.1);
+    }
+    .divider-text {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 13px;
+      background: var(--white);
+      border: 1.5px solid rgba(15,30,60,0.12);
+      border-radius: 8px;
+      color: var(--text-dark);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-google:hover {
+      background: var(--cream);
+      border-color: rgba(15,30,60,0.2);
+      box-shadow: 0 4px 12px rgba(15,30,60,0.06);
+    }
+    .btn-google svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+    .form-footer a {
+      color: var(--saffron);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .form-footer a:hover { color: var(--saffron-dark); }
+
+    /* ── Signup-only fields ── */
+    .signup-fields {
+      display: none;
+    }
+    .signup-fields.visible {
+      display: block;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .login-container {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+      }
+      .login-branding {
+        display: none;
+      }
+      .login-form-panel {
+        padding: 36px 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-form-panel {
+        padding: 28px 20px;
+      }
+      .role-selector {
+        gap: 8px;
+      }
+      .role-btn {
+        padding: 12px 8px;
+      }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" href="assets/logo.png">
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="assets/logo.png" alt="Logo" class="logo">
+    <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
+  </a>
+  <a class="nav-back" href="index.html">
+    <i data-lucide="arrow-left"></i> Back to Home
+  </a>
+</nav>
+
+<!-- ── LOGIN PAGE ── -->
+<main class="login-page">
+  <div class="login-bg"></div>
+  <div class="login-grid-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="login-container">
+    <!-- LEFT — Branding Panel -->
+    <div class="login-branding">
+      <div class="branding-content">
+        <img src="assets/logo.png" alt="Logo" class="logo" style="height: 64px; margin-bottom: 28px;">
+        <h1 class="branding-heading" id="branding-heading">
+          Find the <span class="accent">Right Tutor</span>
+        </h1>
+        <p class="branding-desc" id="branding-desc">
+          Post your tuition requirement for free and get connected with verified, qualified home tutors across Delhi within 24 hours.
+        </p>
+        <div class="branding-stats">
+          <div>
+            <div class="branding-stat-num">2,500+</div>
+            <div class="branding-stat-label">Active Tutors</div>
+          </div>
+          <div>
+            <div class="branding-stat-num">8,000+</div>
+            <div class="branding-stat-label">Happy Students</div>
+          </div>
+          <div>
+            <div class="branding-stat-num">4.9★</div>
+            <div class="branding-stat-label">Avg. Rating</div>
+          </div>
+        </div>
+        <div class="branding-trust">
+          <span class="branding-trust-badge"><i data-lucide="shield-check"></i> Verified & Trusted</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — Form Panel -->
+    <div class="login-form-panel">
+      <!-- Role Selector -->
+      <div class="role-selector" style="display: none;">
+        <button class="role-btn active" id="role-student">
+          <div class="role-btn-icon"><i data-lucide="book-open"></i></div>
+          <div class="role-btn-label">I'm a Student / Parent</div>
+        </button>
+        <button class="role-btn" id="role-tutor">
+          <div class="role-btn-icon"><i data-lucide="presentation"></i></div>
+          <div class="role-btn-label">I'm a Tutor</div>
+        </button>
+      </div>
+
+      <!-- Mode Toggle -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-login">Log In</button>
+        <button class="mode-btn" id="mode-signup">Sign Up</button>
+      </div>
+
+      <!-- Dynamic Heading -->
+      <h2 class="form-heading" id="form-heading">Welcome back</h2>
+      <p class="form-subheading" id="form-subheading">Sign in to find the right tutor for your needs</p>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <!-- Email Verification Banner -->
+      <div id="verification-banner" class="verification-banner">
+        <div class="vb-icon">📧</div>
+        <div class="vb-heading">Please verify your email before continuing</div>
+        <div class="vb-text">Check your inbox for the verification link. Click the link to verify your email, then come back and log in.</div>
+        <button class="btn-resend" id="resend-btn" onclick="resendVerificationEmail()">Resend Verification Email</button>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="auth-form">
+        <!-- Signup-only: Full Name -->
+        <div class="signup-fields" id="signup-fields-name">
+          <div class="form-group">
+            <label class="form-label" for="full-name">Full Name</label>
+            <input class="form-input" type="text" id="full-name" placeholder="Enter your full name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="password-wrapper">
+            <input class="form-input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+              <i data-lucide="eye" id="eye-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Signup-only: Phone -->
+        <div class="signup-fields" id="signup-fields-phone">
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input class="form-input" type="tel" id="phone" placeholder="+91 9XXXXXXXXX" />
+          </div>
+        </div>
+
+        <!-- Login extras -->
+        <div class="form-extras" id="login-extras">
+          <label class="remember-me">
+            <input type="checkbox" id="remember" /> Remember me
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <i data-lucide="log-in"></i>
+          <span id="submit-text">Sign In</span>
+        </button>
+      </form>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">or</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="btn-google" id="google-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 0 0 1.14 12c0 1.62.39 3.16 1.04 4.52l3.66-2.43z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="form-footer" id="form-footer">
+        Don't have an account? <a href="/signup">Create one now</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+  import { 
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+    signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, 
+    sendEmailVerification, signOut, sendPasswordResetEmail,
+    setPersistence, browserLocalPersistence, browserSessionPersistence
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import { 
+    getFirestore, doc, setDoc, getDoc, serverTimestamp 
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",
+    authDomain: "hometutor-2dbc0.firebaseapp.com",
+    projectId: "hometutor-2dbc0",
+    storageBucket: "hometutor-2dbc0.firebasestorage.app",
+    messagingSenderId: "792391008247",
+    appId: "1:792391008247:web:fa9e76a8caa448351d38f2",
+    measurementId: "G-YEJZRFBNDC"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app); 
+  const auth = getAuth(app);
+  
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  /* ══════════════════════════════════════
+     HELPERS
+     ══════════════════════════════════════ */
+
+  function normalizeRole(role) {
+    const r = (role || '').toLowerCase();
+    if (r === 'student' || r === 'parent') return 'student';
+    if (r === 'tutor') return 'tutor';
+    if (r === 'admin') return 'admin';
+    return null;
+  }
+
+  function redirectUser(role) {
+    const r = normalizeRole(role);
+    if (r === 'admin') {
+      window.location.href = 'admin-dashboard.html';
+    } else if (r === 'tutor') {
+      window.location.href = 'tutor-dashboard.html';
+    } else if (r === 'student') {
+      window.location.href = 'student-dashboard.html';
+    } else {
+      window.location.href = 'select-role.html';
+    }
+  }
+
+  function showError(msg) {
+    const errDiv = document.getElementById('error-message');
+    const sucDiv = document.getElementById('success-message');
+    if (errDiv) { errDiv.textContent = msg; errDiv.style.display = 'block'; }
+    if (sucDiv) sucDiv.style.display = 'none';
+    hideVerificationBanner();
+  }
+
+  function hideError() {
+    const errDiv = document.getElementById('error-message');
+    if (errDiv) errDiv.style.display = 'none';
+  }
+
+  function showSuccess(msg) {
+    const sucDiv = document.getElementById('success-message');
+    const errDiv = document.getElementById('error-message');
+    if (sucDiv) { sucDiv.textContent = msg; sucDiv.style.display = 'block'; }
+    if (errDiv) errDiv.style.display = 'none';
+  }
+
+  function showVerificationBanner(email) {
+    const banner = document.getElementById('verification-banner');
+    if (banner) {
+      banner.style.display = 'block';
+      const vbText = banner.querySelector('.vb-text');
+      if (vbText && email) {
+        vbText.textContent = `We sent a verification link to ${email}. Check your inbox and spam/junk folder, then come back and log in.`;
+      }
+    }
+  }
+
+  function hideVerificationBanner() {
+    const banner = document.getElementById('verification-banner');
+    if (banner) banner.style.display = 'none';
+  }
+
+  /* ══════════════════════════════════════
+     FIREBASE ERROR MAP
+     ══════════════════════════════════════ */
+
+  const FIREBASE_ERROR_MAP = {
+    'auth/network-request-failed': 'Connection failed. Please check your internet.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/invalid-credential': 'Incorrect email or password. Please try again.',
+    'auth/email-already-in-use': 'This email is already registered.',
+    'auth/weak-password': 'Password is too weak. Please use at least 6 characters.',
+    'auth/too-many-requests': 'Too many failed attempts. Please try again after a few minutes.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/user-disabled': 'This account has been disabled. Please contact support.',
+    'auth/popup-blocked': 'Popup blocked. Please allow popups for this site.',
+    'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
+    'auth/requires-recent-login': 'Please log in again to perform this action.',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+  };
+
+  function getFriendlyError(error) {
+    if (error && error.code && FIREBASE_ERROR_MAP[error.code]) {
+      return FIREBASE_ERROR_MAP[error.code];
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
+
+  /* ══════════════════════════════════════
+     STATE
+     ══════════════════════════════════════ */
+
+  let currentRole = 'student';
+  let currentMode = 'login';
+  let signupInProgress = false;
+  let activeLoginAttempt = false;
+
+  const BLOCKED_DOMAINS = [
+    'tempmail.com', '10minutemail.com', 'guerrillamail.com', 
+    'mailinator.com', 'yopmail.com'
+  ];
+
+  function isEmailBlocked(email) {
+    if (!email) return false;
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    const domain = parts[1].toLowerCase();
+    return BLOCKED_DOMAINS.some(blocked => domain.includes(blocked));
+  }
+
+  /* ══════════════════════════════════════
+     PERSISTENT SESSION CHECK
+     ══════════════════════════════════════ */
+
+  let authInitialized = false;
+
+  onAuthStateChanged(auth, async (user) => {
+    authInitialized = true;
+    const mode = currentMode || 'login';
+    const origText = mode === 'login' ? 'Sign In' : 'Create Account';
+
+    console.log("Auth triggered");
+    console.log("User:", user);
+
+    if (user) {
+      const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+
+      if (!isGoogleUser) {
+        await user.reload();
+        if (!user.emailVerified) {
+          showVerificationBanner(user.email);
+          setButtonLoading('submit-btn', false, origText, '');
+          return;
+        }
+      }
+
+      if (signupInProgress) {
+        signupInProgress = false;
+      }
+
+      setButtonLoading('submit-btn', true, origText, 'Checking session...');
+
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          if (isEmailBlocked(user.email)) {
+             await user.delete();
+             showError("Temporary email addresses are not allowed. Please use a valid email.");
+             setButtonLoading('submit-btn', false, origText, '');
+             activeLoginAttempt = false;
+             return;
+          }
+          await setDoc(userDocRef, {
+            role: null,
+            email: user.email,
+            fullName: user.displayName || '',
+            createdAt: serverTimestamp()
+          });
+          window.location.href = 'select-role.html';
+          setButtonLoading('submit-btn', false, origText, '');
+          return;
+        }
+
+        // Check if user is an admin first
+        try {
+          const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+          if (adminDoc.exists() && adminDoc.data().role === 'admin') {
+            window.location.href = 'admin-dashboard.html';
+            setButtonLoading('submit-btn', false, origText, '');
+            return;
+          }
+        } catch(adminErr) { /* Not an admin, continue normally */ }
+
+        const role = normalizeRole(userDoc.data().role);
+        console.log("Role:", role);
+        if (!role) {
+          window.location.href = 'select-role.html';
+        } else {
+          redirectUser(role);
+        }
+        setButtonLoading('submit-btn', false, origText, '');
+      } catch (error) {
+        showError(getFriendlyError(error));
+        setButtonLoading('submit-btn', false, origText, '');
+      }
+    } else {
+      setButtonLoading('submit-btn', false, origText, '');
+    }
+  });
+
+  /* ══════════════════════════════════════
+     ROUTE-BASED MODE DETECTION
+     ══════════════════════════════════════ */
+
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role');
+    const modeParam = params.get('mode');
+    const pathname = window.location.pathname;
+    
+    // Route-based UI control exactly equivalent to useLocation()
+    if (pathname.includes('/signup') || modeParam === 'signup') {
+      currentMode = 'signup';
+    } else {
+      currentMode = 'login';
+    }
+
+    if (role === 'tutor') {
+      currentRole = 'tutor';
+    }
+  })();
+
+  /* ══════════════════════════════════════
+     ROLE SELECTION
+     ══════════════════════════════════════ */
+
+  function selectRole(role) {
+    currentRole = role;
+    const studentBtn = document.getElementById('role-student');
+    const tutorBtn = document.getElementById('role-tutor');
+    if (studentBtn) studentBtn.classList.toggle('active', role === 'student');
+    if (tutorBtn) tutorBtn.classList.toggle('active', role === 'tutor');
+    hideError();
+    hideVerificationBanner();
+    updateUI();
+    if (window.lucide) lucide.createIcons();
+  }
+  window.selectRole = selectRole;
+
+  /* ══════════════════════════════════════
+     ROUTE-BASED UI INITIALIZATION
+     ══════════════════════════════════════ */
+
+  function initializeRouteUI() {
+    const isSignup = currentMode === 'signup';
+    
+    const loginBtn = document.getElementById('mode-login');
+    const signupBtn = document.getElementById('mode-signup');
+    if (loginBtn) loginBtn.classList.toggle('active', !isSignup);
+    if (signupBtn) signupBtn.classList.toggle('active', isSignup);
+
+    const signupFields = document.querySelectorAll('.signup-fields');
+    signupFields.forEach(f => f.classList.toggle('visible', isSignup));
+
+    // Conditionally render header options ONLY when pathname === "/signup"
+    const roleSelector = document.querySelector('.role-selector');
+    if (roleSelector) {
+      roleSelector.style.display = isSignup ? 'grid' : 'none';
+    }
+
+    const loginExtras = document.getElementById('login-extras');
+    if (loginExtras) loginExtras.style.display = !isSignup ? 'flex' : 'none';
+
+    hideError();
+    hideVerificationBanner();
+    updateUI();
+  }
+  window.initializeRouteUI = initializeRouteUI;
+
+  /* ══════════════════════════════════════
+     UPDATE UI LABELS
+     ══════════════════════════════════════ */
+
+  function updateUI() {
+    const heading = document.getElementById('form-heading');
+    const subheading = document.getElementById('form-subheading');
+    const submitText = document.getElementById('submit-text');
+    const footer = document.getElementById('form-footer');
+    const brandingHeading = document.getElementById('branding-heading');
+    const brandingDesc = document.getElementById('branding-desc');
+
+    if (currentMode === 'login') {
+      if (heading) heading.textContent = 'Welcome back';
+      if (submitText) submitText.textContent = 'Sign In';
+      if (footer) footer.innerHTML = 'Don\'t have an account? <a href="/signup">Create one now</a>';
+
+      if (currentRole === 'student') {
+        if (subheading) subheading.textContent = 'Sign in to find the right tutor for your needs';
+      } else {
+        if (subheading) subheading.textContent = 'Sign in to access student leads and grow your business';
+      }
+    } else {
+      if (submitText) submitText.textContent = 'Create Account';
+      if (footer) footer.innerHTML = 'Already have an account? <a href="/login">Sign in</a>';
+
+      if (currentRole === 'student') {
+        if (heading) heading.textContent = 'Find the right tutor';
+        if (subheading) subheading.textContent = 'Create your account to post tuition inquiries for free';
+      } else {
+        if (heading) heading.textContent = 'Start getting tuition leads';
+        if (subheading) subheading.textContent = 'Create your tutor account and start receiving student leads';
+      }
+    }
+
+    if (currentRole === 'student') {
+      if (brandingHeading) brandingHeading.innerHTML = 'Find the <span class="accent">Right Tutor</span>';
+      if (brandingDesc) brandingDesc.textContent = 'Post your tuition requirement for free and get connected with verified, qualified home tutors across Delhi within 24 hours.';
+    } else {
+      if (brandingHeading) brandingHeading.innerHTML = 'Start Getting <span class="accent">Tuition Leads</span>';
+      if (brandingDesc) brandingDesc.textContent = 'Register as a verified tutor today. Get daily student leads in your area and build a strong, consistent income from tutoring.';
+    }
+  }
+
+  /* ══════════════════════════════════════
+     PASSWORD TOGGLE
+     ══════════════════════════════════════ */
+
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const iconEl = document.getElementById('eye-icon');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      iconEl.outerHTML = '<i data-lucide="eye-off" id="eye-icon"></i>';
+    } else {
+      pw.type = 'password';
+      iconEl.outerHTML = '<i data-lucide="eye" id="eye-icon"></i>';
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+  window.togglePassword = togglePassword;
+
+  /* ══════════════════════════════════════
+     BUTTON LOADING STATE
+     ══════════════════════════════════════ */
+
+  function setButtonLoading(btnId, isLoading, originalText, loadingText) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    if (isLoading) {
+      if (btnId === 'submit-btn') {
+        document.getElementById('submit-text').textContent = loadingText;
+      } else {
+        btn.innerHTML = loadingText;
+      }
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.7';
+    } else {
+      if (btnId === 'submit-btn') {
+        document.getElementById('submit-text').textContent = originalText;
+      } else {
+        btn.innerHTML = originalText;
+      }
+      btn.style.pointerEvents = '';
+      btn.style.opacity = '';
+    }
+  }
+
+  /* ══════════════════════════════════════
+     RESEND VERIFICATION EMAIL
+     ══════════════════════════════════════ */
+
+  async function resendVerificationEmail() {
+    const btn = document.getElementById('resend-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    try {
+      let user = auth.currentUser;
+      if (!user) {
+        showError('No user session found. Please sign up or log in first.');
+        return;
+      }
+      await sendEmailVerification(user);
+      showSuccess('Verification email sent! Check your inbox and spam folder.');
+    } catch (error) {
+      if (error.code === 'auth/too-many-requests') {
+        showError('Too many requests. Please wait a few minutes before trying again.');
+      } else {
+        showError(getFriendlyError(error));
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Resend Verification Email';
+    }
+  }
+  window.resendVerificationEmail = resendVerificationEmail;
+
+  /* ══════════════════════════════════════
+     FORGOT PASSWORD
+     ══════════════════════════════════════ */
+
+  async function handleForgotPassword(e) {
+    if (e) e.preventDefault();
+    hideError();
+    const emailInput = document.getElementById('email');
+    const email = emailInput ? emailInput.value.trim() : '';
+    if (!email) {
+      showError('Please enter your email address above, then click "Forgot password?"');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showSuccess('A password reset link has been sent to your email.');
+    } catch (error) {
+      showError(getFriendlyError(error));
+    }
+  }
+  window.handleForgotPassword = handleForgotPassword;
+
+  /* ══════════════════════════════════════
+     FORM SUBMIT (LOGIN & SIGNUP)
+     ══════════════════════════════════════ */
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    hideError();
+    hideVerificationBanner();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const role = currentRole;
+    const mode = currentMode;
+
+    const btnId = 'submit-btn';
+    const origText = mode === 'login' ? 'Sign In' : 'Create Account';
+    const loadText = mode === 'login' ? 'Signing in...' : 'Creating account...';
+
+    setButtonLoading(btnId, true, origText, loadText);
+
+    try {
+      if (mode === 'login') {
+        const rememberMe = document.getElementById('remember').checked;
+        try {
+          await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+        } catch(persistErr) {}
+
+        const loginCred = await signInWithEmailAndPassword(auth, email, password);
+        const loginUser = loginCred.user;
+
+        setTimeout(() => {
+          setButtonLoading('submit-btn', false, origText, '');
+        }, 5000);
+
+        const isGoogle = loginUser.providerData.some(p => p.providerId === 'google.com');
+        if (!isGoogle && !loginUser.emailVerified) {
+          showVerificationBanner(email);
+          setButtonLoading(btnId, false, origText, loadText);
+          return;
+        }
+      } else {
+        if (isEmailBlocked(email)) {
+          showError("Temporary email addresses are not allowed. Please use a valid email.");
+          setButtonLoading(btnId, false, origText, loadText);
+          return;
+        }
+
+        const fullName = document.getElementById('full-name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        signupInProgress = true;
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userData = {
+          role: role,
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          createdAt: serverTimestamp()
+        };
+
+        // Add tutor-specific status fields
+        if (role === 'tutor') {
+          userData.status = 'pending';
+          userData.submittedAt = serverTimestamp();
+          userData.rejectionReason = null;
+          userData.reviewedAt = null;
+          userData.profileImageUrl = null;
+          userData.documentUrl = null;
+        }
+
+        await setDoc(doc(db, 'users', user.uid), userData);
+
+        try { await sendEmailVerification(user); } catch (verifyErr) {}
+
+        sessionStorage.setItem('verifyEmail', email);
+        sessionStorage.setItem('pendingVerification', 'true');
+
+        setButtonLoading(btnId, false, origText, loadText);
+        signupInProgress = false;
+        window.location.href = 'verify-email.html';
+        return;
+      }
+    } catch (error) {
+      signupInProgress = false;
+      showError(getFriendlyError(error));
+      setButtonLoading(btnId, false, origText, loadText);
+    }
+  }
+  window.handleSubmit = handleSubmit;
+
+  /* ══════════════════════════════════════
+     GOOGLE AUTH
+     ══════════════════════════════════════ */
+
+  const GOOGLE_BTN_ORIGINAL_HTML = `
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 0 0 1.14 12c0 1.62.39 3.16 1.04 4.52l3.66-2.43z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  `;
+
+  async function handleGoogleAuth() {
+    activeLoginAttempt = true;
+    const popupPromise = signInWithPopup(auth, provider);
+    setButtonLoading('google-btn', true, GOOGLE_BTN_ORIGINAL_HTML, 'Connecting...');
+    hideError();
+
+    try {
+      await popupPromise;
+    } catch (error) {
+      if (error.code === 'auth/popup-blocked') {
+        showError("Popup blocked. Redirecting to Google login...");
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch(redirectErr) {
+          showError("Could not connect to Google. Please try again.");
+        }
+        return; // Redirect will navigate user away
+      }
+
+      if (error.code !== 'auth/popup-closed-by-user') {
+        showError(error.message);
+      }
+      setButtonLoading('google-btn', false, GOOGLE_BTN_ORIGINAL_HTML, '');
+    }
+  }
+  window.handleGoogleAuth = handleGoogleAuth;
+
+  /* ══════════════════════════════════════
+     DOM READY — ATTACH EVENT LISTENERS
+     ══════════════════════════════════════ */
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize UI strictly from route state
+    initializeRouteUI();
+
+    // Apply URL param role selection
+    if (currentRole === 'tutor') {
+      selectRole('tutor');
+    }
+
+    const studentBtn = document.getElementById('role-student');
+    if (studentBtn) studentBtn.addEventListener('click', () => selectRole('student'));
+
+    const tutorBtn = document.getElementById('role-tutor');
+    if (tutorBtn) tutorBtn.addEventListener('click', () => selectRole('tutor'));
+
+    // Route transitions instead of state toggle
+    const modeLogin = document.getElementById('mode-login');
+    if (modeLogin) modeLogin.addEventListener('click', () => window.location.href = '/login');
+
+    const modeSignup = document.getElementById('mode-signup');
+    if (modeSignup) modeSignup.addEventListener('click', () => window.location.href = '/signup');
+
+    const authForm = document.getElementById('auth-form');
+    if (authForm) {
+      authForm.addEventListener('submit', handleSubmit);
+    }
+
+    const pwToggle = document.querySelector('.password-toggle');
+    if (pwToggle) pwToggle.addEventListener('click', togglePassword);
+
+    const googleBtn = document.getElementById('google-btn');
+    if (googleBtn) googleBtn.addEventListener('click', handleGoogleAuth);
+
+    // BUG 23: Forgot password link
+    const forgotLink = document.querySelector('.forgot-link');
+    if (forgotLink) forgotLink.addEventListener('click', handleForgotPassword);
+  });
+</script>
+
+<!-- ── LUCIDE ICONS ── -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
