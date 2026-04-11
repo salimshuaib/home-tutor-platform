@@ -14,20 +14,20 @@ admin.initializeApp({
 const db = admin.firestore();
 
 // ━━━ UPDATE THESE TWO VALUES ━━━
-const TARGET_UID = 'rAvulUH4dSPo2iDgWxpTMbfiLso2'; 
-const TARGET_EMAIL = 'support@delhiprivatetutor.com';
+const TARGET_UID = 'Q64pgm1x4sQMyTngCbS0Iq2rPgt1';
+const TARGET_EMAIL = 'delhiprivatehometutor@zohomail.in';
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 async function grantAdmin() {
   console.log(`Attempting to grant admin access to: ${TARGET_EMAIL}...`);
-  
+
   try {
     await db.collection('admins').doc(TARGET_UID).set({
       role: 'admin',
       email: TARGET_EMAIL,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
-    
+
     console.log('--------------------------------------------------');
     console.log('✅ SUCCESS: Admin access granted!');
     console.log('You can now log in at your-site.com/login.html');

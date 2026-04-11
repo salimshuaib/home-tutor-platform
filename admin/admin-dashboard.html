@@ -195,12 +195,9 @@
 
 <!-- ━━━ LOADER ━━━ -->
 <div class="loader-overlay" id="loader">
-  <div>
+  <div style="text-align: center;">
     <div class="loader-spinner"></div>
-    <div class="loader-error" id="loader-error">
-      <p>Loading is taking too long.</p>
-      <button class="btn" onclick="window.location.reload()">Retry</button>
-    </div>
+    <div id="loader-message" style="color: white; margin-top: 1.5rem; font-weight: 500; font-size: 0.9rem; opacity: 0.8;">Checking session...</div>
   </div>
 </div>
 
@@ -309,7 +306,7 @@
 <!-- ━━━ SCRIPTS ━━━ -->
 <script>lucide.createIcons();</script>
 <script type="module">
-  import { initAdminAuth, switchSection } from './admin/admin.js';
+  import { initAdminAuth, switchSection } from './admin.js';
 
   // Initialize admin auth guard
   initAdminAuth();

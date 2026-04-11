@@ -28,6 +28,7 @@ const db = getFirestore(app);
 let currentAdmin = null;
 let allTutors = [];
 let unsubTutors = null;
+let isCheckingAdmin = false;
 
 /* ━━━ DOM HELPERS ━━━ */
 function $(id) { return document.getElementById(id); }
@@ -45,56 +46,75 @@ function showToast(msg, type = 'success') {
 
 /* ━━━ ADMIN AUTH GUARD ━━━ */
 function initAdminAuth() {
-  // Loading timeout
-  const loaderTimeout = setTimeout(() => {
-    const errEl = $('loader-error');
-    if (errEl) errEl.style.display = 'block';
-  }, 12000);
-
   onAuthStateChanged(auth, async (user) => {
+    if (isCheckingAdmin) return;
+    isCheckingAdmin = true;
+
     if (!user) {
-      window.location.replace('../login.html');
+      window.location.href = "../login.html";
       return;
     }
 
     try {
-      // Check admins collection
-      const adminSnap = await getDoc(doc(db, 'admins', user.uid));
-      if (!adminSnap.exists() || adminSnap.data().role !== 'admin') {
-        // Not an admin — sign out and redirect
-        await signOut(auth);
-        window.location.replace('../login.html');
+      console.log("Checking admin for UID:", user.uid);
+      
+      const adminRef = doc(db, "admins", user.uid);
+      const adminSnap = await getDoc(adminRef);
+
+      if (!adminSnap.exists()) {
+        console.warn("Access denied: Not an admin");
+        alert("Access denied");
+        window.location.href = "../login.html";
         return;
       }
 
+      console.log("Admin verified");
       currentAdmin = user;
-      const adminData = adminSnap.data();
+      
+      // Stop Loading UI
+      const loader = document.getElementById("loader");
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = "none";
+        }, 400);
+      }
 
-      // Set admin info in nav
-      const name = adminData.name || adminData.email || 'Admin';
-      const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-      $('nav-admin-name').textContent = name.split(' ')[0];
-      $('nav-admin-avatar').textContent = initials;
+      // Load dashboard content
+      loadAdminDashboard(adminSnap.data());
+      
+      console.log("Admin dashboard loaded successfully");
 
-      // Start real-time listener
-      startTutorListener();
-
-      // Hide loader
-      clearTimeout(loaderTimeout);
-      $('loader').style.opacity = '0';
-      setTimeout(() => $('loader').style.display = 'none', 400);
-
-    } catch (e) {
-      console.error('Admin auth check failed:', e);
-      await signOut(auth);
-      window.location.replace('../login.html');
+    } catch (error) {
+      console.error("Admin check error:", error);
     }
   });
 
   // Logout
-  $('logout-btn').addEventListener('click', () => {
-    signOut(auth).then(() => window.location.href = '../login.html');
-  });
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => window.location.href = '../login.html');
+    });
+  }
+}
+
+/**
+ * Loads dashboard content after admin verification
+ */
+function loadAdminDashboard(adminData) {
+  // Set admin info in nav
+  const name = adminData.name || adminData.email || 'Admin';
+  const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+  
+  const nameEl = document.getElementById('nav-admin-name');
+  const avatarEl = document.getElementById('nav-admin-avatar');
+  
+  if (nameEl) nameEl.textContent = name.split(' ')[0];
+  if (avatarEl) avatarEl.textContent = initials;
+
+  // Start real-time data listener
+  startTutorListener();
 }
 
 /* ━━━ REAL-TIME TUTOR LISTENER ━━━ */

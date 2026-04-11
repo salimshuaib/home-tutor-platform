@@ -466,13 +466,7 @@
 
     <div class="loader-spinner"></div>
 
-    <div class="loader-error" id="loader-error">
-
-      <p>Loading is taking too long.</p>
-
-      <button class="btn" onclick="window.location.reload()">Retry</button>
-
-    </div>
+    <div id="loader-message" style="color: white; margin-top: 1.5rem; font-weight: 500; font-size: 0.9rem; opacity: 0.8;">Checking session...</div>
 
   </div>
 
@@ -1018,7 +1012,11 @@
 
 
 
+  let isCheckingTutor = false;
   onAuthStateChanged(auth, async (user) => {
+    if (isCheckingTutor) return;
+    isCheckingTutor = true;
+
 
     if (!user) { window.location.replace('login.html?role=tutor'); return; }
 
