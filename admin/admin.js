@@ -147,7 +147,7 @@ function startTutorListener() {
 
 /* ━━━ STATS ━━━ */
 function updateStats() {
-  const pending = allTutors.filter(t => t.status === 'pending' || !t.status);
+  const pending = allTutors.filter(t => (t.status === 'pending' || !t.status) && t.profileSubmitted === true);
   const approved = allTutors.filter(t => t.status === 'approved');
   const rejected = allTutors.filter(t => t.status === 'rejected');
 
@@ -180,12 +180,12 @@ function renderCurrentSection() {
 
 /* ━━━ OVERVIEW ━━━ */
 function renderOverview() {
-  const pending = allTutors.filter(t => t.status === 'pending' || !t.status);
+  const pending = allTutors.filter(t => (t.status === 'pending' || !t.status) && t.profileSubmitted === true);
   const container = $('overview-recent');
   if (!container) return;
 
   if (pending.length === 0) {
-    container.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No pending applications</h3><p>All tutor applications have been reviewed.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><i data-lucide="check-circle"></i><h3>All clear!</h3><p>No pending tutor applications to review.</p></div>`;
   } else {
     container.innerHTML = `<div class="tutor-grid">${pending.slice(0, 6).map(t => tutorCard(t)).join('')}</div>`;
   }
@@ -194,7 +194,7 @@ function renderOverview() {
 
 /* ━━━ PENDING ━━━ */
 function renderPending() {
-  const pending = allTutors.filter(t => t.status === 'pending' || !t.status);
+  const pending = allTutors.filter(t => (t.status === 'pending' || !t.status) && t.profileSubmitted === true);
   const container = $('pending-container');
   if (!container) return;
 
@@ -277,7 +277,7 @@ function tutorCard(t) {
       </button>
     </div>
   </div>`;
-
+}
 
 function tutorListItem(t, type) {
   const name = t.fullName || 'Unknown';
