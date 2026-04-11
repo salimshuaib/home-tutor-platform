@@ -1,109 +1,116 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // ─── HELPER FUNCTIONS ───
-    function isAuth() {
-      return request.auth != null;
-    }
-    function isOwner(uid) {
-      return isAuth() && request.auth.uid == uid;
-    }
-    function isVerified() {
-      return isAuth() && (
-        request.auth.token.email_verified == true ||
-        request.auth.token.firebase.sign_in_provider == 'google.com'
-      );
-    }
-    function isAdmin() {
-      return isAuth() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
-    }
-
-    // ─── ADMINS COLLECTION ───
-    // Admins can only read their own record. Write is denied (manage via Firebase Console).
-    match /admins/{adminId} {
-      allow read: if isOwner(adminId);
-      allow write: if false;
-    }
-
-    // ─── USERS COLLECTION ───
-    // Users can read/write only their own profile.
-    // Status fields (status, reviewedAt, rejectionReason) can ONLY be changed by admins,
-    // EXCEPT: a tutor can reset their own status from "rejected" to "pending" (re-application).
-    match /users/{userId} {
-      allow read: if isAuth();
-      allow create: if isOwner(userId);
-
-      // Admin can update any user field
-      allow update: if isAdmin();
-
-      // Owner can update their own profile, with restrictions on status fields
-      allow update: if isOwner(userId)
-        && (
-          // Case 1: No protected fields are being changed
-          !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['status', 'reviewedAt', 'rejectionReason'])
-          ||
-          // Case 2: Re-application — tutor resets from "rejected" to "pending"
-          (
-            resource.data.status == 'rejected'
-            && request.resource.data.status == 'pending'
-            && request.resource.data.rejectionReason == null
-          )
-        );
-
-      allow delete: if false; // Users cannot self-delete; admin only
-    }
-
-    // ─── REQUESTS COLLECTION ───
-    // Students can CRUD their own requests; tutors can read and apply to pending requests
-    match /requests/{requestId} {
-      // Anyone authenticated can read requests (tutors browse pending ones)
-      allow read: if isAuth();
-
-      // Only verified users can create, and must set studentUID/userId to their own UID
-      allow create: if isVerified()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.studentUID == request.auth.uid;
-
-      // Owner can update their own request (all fields)
-      allow update: if isAuth()
-        && resource.data.userId == request.auth.uid;
-
-      // Tutors can apply: add their UID to appliedTutors and set status to 'active'
-      allow update: if isAuth()
-        && request.resource.data.diff(resource.data).affectedKeys()
-           .hasOnly(['appliedTutors', 'status'])
-        && request.resource.data.status in ['pending', 'active'];
-
-      // Admins can update any request
-      allow update: if isAdmin();
-
-      // BUG 20: Only the owner of the request can delete it
-      allow delete: if isAuth()
-        && (resource.data.userId == request.auth.uid
-            || resource.data.studentUID == request.auth.uid);
-    }
-
-    // ─── LEADS COLLECTION ───
-    // Tutors can create leads and read their own leads
-    match /leads/{leadId} {
-      allow read: if isAuth()
-        && resource.data.tutorId == request.auth.uid;
-
-      allow create: if isVerified()
-        && request.resource.data.tutorId == request.auth.uid;
-
-      allow update: if isAuth()
-        && resource.data.tutorId == request.auth.uid;
-
-      allow delete: if isAuth()
-        && resource.data.tutorId == request.auth.uid;
-    }
-
-    // ─── DEFAULT: DENY ALL ───
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── HELPER FUNCTIONS ───
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+    function isVerified() {
+      return isAuth() && (
+        request.auth.token.email_verified == true ||
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+    function isAdmin() {
+      return isAuth() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // ─── ADMINS COLLECTION ───
+    // Admins can only read their own record. Write is denied (manage via Firebase Console).
+    match /admins/{adminId} {
+      allow read: if isOwner(adminId);
+      allow write: if false;
+    }
+
+    // ─── USERS COLLECTION ───
+    // Users can read/write only their own profile.
+    // Status fields (status, reviewedAt, rejectionReason) can ONLY be changed by admins,
+    // EXCEPT: a tutor can reset their own status from "rejected" to "pending" (re-application).
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isOwner(userId);
+
+      // Admin can update any user field
+      allow update: if isAdmin();
+
+      // Owner can update their own profile, with restrictions on status fields
+      allow update: if isOwner(userId)
+        && (
+          // Case 1: No protected fields are being changed
+          !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['status', 'reviewedAt', 'rejectionReason'])
+          ||
+          // Case 2: Re-application — tutor resets from "rejected" to "pending"
+          (
+            resource.data.get('status', null) == 'rejected'
+            && request.resource.data.get('status', null) == 'pending'
+            && request.resource.data.get('rejectionReason', null) == null
+          )
+          ||
+          // Case 3: Initial application — setting status to pending for the first time
+          (
+            resource.data.get('status', null) == null
+            && request.resource.data.get('status', null) == 'pending'
+            && request.resource.data.get('rejectionReason', null) == null
+          )
+        );
+
+      allow delete: if false; // Users cannot self-delete; admin only
+    }
+
+    // ─── REQUESTS COLLECTION ───
+    // Students can CRUD their own requests; tutors can read and apply to pending requests
+    match /requests/{requestId} {
+      // Anyone authenticated can read requests (tutors browse pending ones)
+      allow read: if isAuth();
+
+      // Only verified users can create, and must set studentUID/userId to their own UID
+      allow create: if isVerified()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.studentUID == request.auth.uid;
+
+      // Owner can update their own request (all fields)
+      allow update: if isAuth()
+        && resource.data.userId == request.auth.uid;
+
+      // Tutors can apply: add their UID to appliedTutors and set status to 'active'
+      allow update: if isAuth()
+        && request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['appliedTutors', 'status'])
+        && request.resource.data.status in ['pending', 'active'];
+
+      // Admins can update any request
+      allow update: if isAdmin();
+
+      // BUG 20: Only the owner of the request can delete it
+      allow delete: if isAuth()
+        && (resource.data.userId == request.auth.uid
+            || resource.data.studentUID == request.auth.uid);
+    }
+
+    // ─── LEADS COLLECTION ───
+    // Tutors can create leads and read their own leads
+    match /leads/{leadId} {
+      allow read: if isAuth()
+        && resource.data.tutorId == request.auth.uid;
+
+      allow create: if isVerified()
+        && request.resource.data.tutorId == request.auth.uid;
+
+      allow update: if isAuth()
+        && resource.data.tutorId == request.auth.uid;
+
+      allow delete: if isAuth()
+        && resource.data.tutorId == request.auth.uid;
+    }
+
+    // ─── DEFAULT: DENY ALL ───
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
