@@ -85,8 +85,7 @@ service cloud.firestore {
         && resource.data.status == 'pending'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['appliedTutors', 'status'])
         && request.resource.data.status in ['pending', 'active']
-        && request.resource.data.appliedTutors.hasAll(resource.data.get('appliedTutors', []))
-        && request.auth.uid in request.resource.data.appliedTutors;
+        && request.resource.data.appliedTutors == resource.data.get('appliedTutors', []).concat([request.auth.uid]);
 
       // Admins can update any request
       allow update: if isAdmin();

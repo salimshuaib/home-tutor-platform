@@ -464,6 +464,10 @@
           fullData.createdAt = serverTimestamp();
           await setDoc(userDocRef, fullData);
         } else {
+          // If merging an older document that lacked createdAt, backfill it
+          if (!userDoc.data().createdAt) {
+            fullData.createdAt = serverTimestamp();
+          }
           await setDoc(userDocRef, fullData, { merge: true });
         }
 
