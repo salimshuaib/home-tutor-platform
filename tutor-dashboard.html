@@ -1022,9 +1022,11 @@
 
     if (!user) { window.location.replace('login.html?role=tutor'); return; }
 
+    await user.reload();
+
     const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
 
-    if (!isGoogle && !user.emailVerified) { window.location.replace('login.html?role=tutor'); return; }
+    if (!isGoogle && !auth.currentUser.emailVerified) { window.location.replace('login.html?role=tutor'); return; }
 
 
 
@@ -2011,7 +2013,7 @@
     setTimeout(() => el.style.display = 'none', 5000);
 
   }
-
+</script>
 </body>
 
 </html>
