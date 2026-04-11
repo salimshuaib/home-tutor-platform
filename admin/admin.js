@@ -28,7 +28,6 @@ const db = getFirestore(app);
 let currentAdmin = null;
 let allTutors = [];
 let unsubTutors = null;
-let isCheckingAdmin = false;
 
 /* ━━━ DOM HELPERS ━━━ */
 function $(id) { return document.getElementById(id); }
@@ -47,9 +46,6 @@ function showToast(msg, type = 'success') {
 /* ━━━ ADMIN AUTH GUARD ━━━ */
 function initAdminAuth() {
   onAuthStateChanged(auth, async (user) => {
-    if (isCheckingAdmin) return;
-    isCheckingAdmin = true;
-
     if (!user) {
       window.location.href = "../login.html";
       return;
@@ -57,7 +53,7 @@ function initAdminAuth() {
 
     try {
       console.log("Checking admin for UID:", user.uid);
-      
+
       const adminRef = doc(db, "admins", user.uid);
       const adminSnap = await getDoc(adminRef);
 
@@ -70,23 +66,23 @@ function initAdminAuth() {
 
       console.log("Admin verified");
       currentAdmin = user;
-      
-      // Stop Loading UI
+
+      // Hide loader
       const loader = document.getElementById("loader");
       if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => {
-          loader.style.display = "none";
-        }, 400);
+        loader.style.display = "none";
       }
 
-      // Load dashboard content
+      // Load dashboard
       loadAdminDashboard(adminSnap.data());
-      
-      console.log("Admin dashboard loaded successfully");
 
     } catch (error) {
       console.error("Admin check error:", error);
+
+      const loaderMsg = document.getElementById("loader-message");
+      if (loaderMsg) {
+        loaderMsg.textContent = "Error loading admin session";
+      }
     }
   });
 
