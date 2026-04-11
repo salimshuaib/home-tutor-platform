@@ -32,6 +32,10 @@ let unsubTutors = null;
 /* ━━━ DOM HELPERS ━━━ */
 function $(id) { return document.getElementById(id); }
 function safeText(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+function safeAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/'/g, '&apos;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\\/g, '\\\\');
+}
 
 function showToast(msg, type = 'success') {
   const toast = $('toast');
@@ -79,10 +83,18 @@ function initAdminAuth() {
     } catch (error) {
       console.error("Admin check error:", error);
 
+      const loader = document.getElementById("loader");
+      if (loader) {
+        loader.style.display = "none";
+      }
+
       const loaderMsg = document.getElementById("loader-message");
       if (loaderMsg) {
         loaderMsg.textContent = "Error loading admin session";
       }
+      
+      // Redirect to login if session check fails to avoid infinite loading state
+      window.location.href = "../login.html";
     }
   });
 
@@ -231,10 +243,10 @@ function tutorCard(t) {
   const exp = t.experience ? `${t.experience} yrs exp` : 'N/A';
   const submitted = t.submittedAt ? formatDate(t.submittedAt) : (t.createdAt ? formatDate(t.createdAt) : 'N/A');
   const profileImg = t.profileImageUrl
-    ? `<img src="${safeText(t.profileImageUrl)}" alt="Profile" class="tutor-card-avatar-img" style="cursor:pointer;" onclick="window.adminActions.viewImage('${safeText(t.profileImageUrl)}')">`
+    ? `<img src="${safeText(t.profileImageUrl)}" alt="Profile" class="tutor-card-avatar-img" style="cursor:pointer;" onclick="window.adminActions.viewImage('${safeAttr(t.profileImageUrl)}')">`
     : `<span>${initials}</span>`;
   const docLink = t.documentUrl
-    ? `<button onclick="window.adminActions.viewDoc('${safeText(t.documentUrl)}')" class="btn btn-outline btn-sm"><i data-lucide="file-text"></i> View Document</button>`
+    ? `<button onclick="window.adminActions.viewDoc('${safeAttr(t.documentUrl)}')" class="btn btn-outline btn-sm"><i data-lucide="file-text"></i> View Document</button>`
     : `<span class="no-doc"><i data-lucide="file-x"></i> No document</span>`;
 
   return `
@@ -260,7 +272,7 @@ function tutorCard(t) {
       <button class="btn btn-approve btn-sm" onclick="window.adminActions.approve('${t.id}', this)">
         <i data-lucide="check"></i> Approve
       </button>
-      <button class="btn btn-reject btn-sm" onclick="window.adminActions.openRejectModal('${t.id}', '${safeText(name)}')">
+      <button class="btn btn-reject btn-sm" onclick="window.adminActions.openRejectModal('${t.id}', '${safeAttr(name)}')">
         <i data-lucide="x"></i> Reject
       </button>
     </div>
@@ -452,7 +464,7 @@ window.adminActions.viewProfile = function(uid) {
 
   content.innerHTML = `
     <div style="display:flex; gap: 15px; margin-bottom: 20px;">
-      ${tutor.profileImageUrl ? `<img src="${safeText(tutor.profileImageUrl)}" style="width:100px; height:100px; border-radius:12px; object-fit:cover; cursor:pointer;" onclick="window.adminActions.viewImage('${safeText(tutor.profileImageUrl)}')">` : ''}
+      ${tutor.profileImageUrl ? `<img src="${safeText(tutor.profileImageUrl)}" style="width:100px; height:100px; border-radius:12px; object-fit:cover; cursor:pointer;" onclick="window.adminActions.viewImage('${safeAttr(tutor.profileImageUrl)}')">` : ''}
       <div>
         <h3 style="font-size:1.4rem; color:var(--navy);">${safeText(tutor.fullName || 'Unknown')}</h3>
         <p style="color:var(--text-mid); font-size: 0.9rem;">${safeText(tutor.email)} &bull; ${safeText(tutor.phone || 'No phone')}</p>
@@ -473,7 +485,7 @@ window.adminActions.viewProfile = function(uid) {
       <p style="background:#f9f9f9; padding:10px; border-radius:8px; font-size:0.9rem; margin-top:5px; white-space:pre-wrap;">${safeText(tutor.bio || 'No bio provided.')}</p>
     </div>
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      ${tutor.documentUrl ? `<button onclick="window.adminActions.viewDoc('${safeText(tutor.documentUrl)}')" class="btn btn-outline"><i data-lucide="file-text"></i> View Certificate</button>` : '<span>No Document</span>'}
+      ${tutor.documentUrl ? `<button onclick="window.adminActions.viewDoc('${safeAttr(tutor.documentUrl)}')" class="btn btn-outline"><i data-lucide="file-text"></i> View Certificate</button>` : '<span>No Document</span>'}
     </div>
   `;
 
@@ -483,15 +495,15 @@ window.adminActions.viewProfile = function(uid) {
       <button class="btn btn-approve" onclick="window.adminActions.approve('${uid}', this); document.getElementById('admin-profile-overlay').classList.remove('show');">
         <i data-lucide="check"></i> Approve
       </button>
-      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');">
+      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeAttr(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');">
         <i data-lucide="x"></i> Reject
       </button>`;
   } else if(tutor.status === 'approved') {
-    actionBtns = `<button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');"><i data-lucide="x"></i> Suspend/Reject Tutor</button>`;
+    actionBtns = `<button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeAttr(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');"><i data-lucide="x"></i> Suspend/Reject Tutor</button>`;
   }
   
   actions.innerHTML = actionBtns;
   modal.classList.add('show');
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 };
 
