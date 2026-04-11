@@ -496,11 +496,13 @@
 
 
     window.handleLogout = async function() {
-
-      await signOut(auth);
-
-      window.location.href = 'login.html';
-
+      try {
+        await signOut(auth);
+      } catch (e) {
+        console.error("Logout failed:", e);
+      } finally {
+        window.location.href = 'login.html';
+      }
     };
 
 

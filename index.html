@@ -270,6 +270,9 @@
     }
 
     .path-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
@@ -991,6 +994,8 @@
       gap: 5px;
       cursor: pointer;
       padding: 8px;
+      background: none;
+      border: none;
     }
     .hamburger span {
       width: 22px; height: 2px;
@@ -1030,9 +1035,9 @@
     <a href="login.html?role=student&mode=signup" class="btn-nav btn-nav-outline">Post Inquiry</a>
     <a href="login.html?role=tutor&mode=signup" class="btn-nav btn-nav-fill">Register as Tutor</a>
   </div>
-  <div class="hamburger" onclick="toggleMobileMenu()">
+  <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" onclick="toggleMobileMenu()">
     <span></span><span></span><span></span>
-  </div>
+  </button>
 </nav>
 
 <!-- BUG 41: Mobile Sidebar Menu -->
@@ -1095,18 +1100,18 @@
     </div>
 
     <div class="hero-cards fade-in" style="transition-delay:0.2s">
-      <div class="path-card" onclick="window.location.href='login.html?role=student'">
+      <a href="login.html?role=student" class="path-card">
         <span class="path-card-icon">👨‍<i data-lucide="graduation-cap"></i></span>
         <div class="path-card-title">I Need a Home Tutor</div>
         <div class="path-card-desc">Post your tuition requirement in minutes. Share your class, subjects, preferred timing, and location — our tutors will reach out to you directly.</div>
         <span class="path-card-tag tag-free">✓ Completely Free</span>
-      </div>
-      <div class="path-card" onclick="window.location.href='login.html?role=tutor'">
+      </a>
+      <a href="login.html?role=tutor" class="path-card">
         <span class="path-card-icon"><i data-lucide="presentation"></i></span>
         <div class="path-card-title">I'm a Home Tutor</div>
         <div class="path-card-desc">Register on our platform and get access to verified student inquiries in your preferred areas of Delhi. Build a strong client base with ease.</div>
         <span class="path-card-tag tag-pro">₹1,000 / month</span>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -1406,7 +1411,8 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <div style="font-size:0.78rem">© 2025 Delhi Private Tutors. All rights reserved.</div>
+    <div style="font-size:0.78rem">&copy; <span id="copyright-year">2026</span> Delhi Private Tutors. All rights reserved.</div>
+    <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
     <div class="footer-bottom-links">
       <a href="#">Privacy</a>
       <a href="#">Terms</a>

@@ -1088,10 +1088,9 @@
 
 
 
-    const first = displayName.split(' ')[0];
-
-    const initials = displayName.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
-
+    const nameParts = displayName.trim().split(/\s+/);
+    const first = nameParts[0] || 'Tutor';
+    const initials = nameParts.map(w=>w[0]||'').join('').substring(0,2).toUpperCase() || 'T';
     document.getElementById('nav-user-name').textContent = first;
 
     document.getElementById('nav-avatar').textContent = initials;

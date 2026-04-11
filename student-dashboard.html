@@ -377,6 +377,12 @@
   let isCheckingAuth = false;
 
   /* AUTH */
+  function safeText(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (isCheckingAuth) return;
     isCheckingAuth = true;
@@ -488,11 +494,11 @@
     grid.innerHTML = list.map(t => {
       return `
       <div class="tutor-card">
-        <div class="tutor-top"><div class="tutor-avatar">${t.initials}</div><div class="tutor-info"><h3>${t.name}</h3><div class="tutor-subjects">${t.subjects}</div></div></div>
+        <div class="tutor-top"><div class="tutor-avatar">${safeText(t.initials)}</div><div class="tutor-info"><h3>${safeText(t.name)}</h3><div class="tutor-subjects">${safeText(t.subjects)}</div></div></div>
         <div class="tutor-meta">
-          <span class="tutor-tag"><i data-lucide="briefcase"></i>${t.exp}</span>
-          <span class="tutor-tag"><i data-lucide="map-pin"></i>${t.location}</span>
-          <span class="tutor-tag"><i data-lucide="indian-rupee"></i>${t.fee}</span>
+          <span class="tutor-tag"><i data-lucide="briefcase"></i>${safeText(t.exp)}</span>
+          <span class="tutor-tag"><i data-lucide="map-pin"></i>${safeText(t.location)}</span>
+          <span class="tutor-tag"><i data-lucide="indian-rupee"></i>${safeText(t.fee)}</span>
         </div>
         <div class="tutor-actions">
           <button class="btn btn-primary btn-sm"><i data-lucide="eye"></i> View Profile</button>
@@ -552,8 +558,8 @@
       const sc = r.status === 'pending' ? 'status-pending' : r.status === 'active' ? 'status-active' : 'status-closed';
       return `<div class="request-item">
         <div class="req-icon"><i data-lucide="book-open"></i></div>
-        <div class="req-details"><h4>${r.subject} — ${r.className}</h4><p>${r.mode} • ${r.location}</p></div>
-        <span class="req-status ${sc}">${r.status}</span>
+        <div class="req-details"><h4>${safeText(r.subject)} — ${safeText(r.className)}</h4><p>${safeText(r.mode)} • ${safeText(r.location)}</p></div>
+        <span class="req-status ${sc}">${safeText(r.status)}</span>
         <div class="req-actions">
           <button class="btn btn-outline btn-sm" onclick="openEditModal('${r.id}')"><i data-lucide="pencil"></i></button>
           <button class="btn btn-danger btn-sm" onclick="deleteRequest('${r.id}')"><i data-lucide="trash-2"></i></button>
@@ -658,8 +664,10 @@
         showMsg('profile-msg', 'Profile updated!', 'success');
       }).catch(() => showMsg('profile-msg', 'Failed to update.', 'error'));
     } else {
-      nameEl.innerHTML = `<input class="profile-edit-input" id="edit-name-input" value="${nameEl.textContent}">`;
-      phoneSpan.innerHTML = `<input class="profile-edit-input" id="edit-phone-input" value="${phoneSpan.textContent === 'Not provided' ? '' : phoneSpan.textContent}">`;
+      const safeName = nameEl.textContent.replace(/"/g, '&quot;');
+      const safePhone = phoneSpan.textContent === 'Not provided' ? '' : phoneSpan.textContent.replace(/"/g, '&quot;');
+      nameEl.innerHTML = `<input class="profile-edit-input" id="edit-name-input" value="${safeName}">`;
+      phoneSpan.innerHTML = `<input class="profile-edit-input" id="edit-phone-input" value="${safePhone}">`;
       btn.innerHTML = '<i data-lucide="save"></i> Save';
       btn.dataset.editing = 'true';
     }

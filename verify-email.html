@@ -272,11 +272,11 @@
   }
 
   function redirectByRole(role) {
-    const r = (role || '').toLowerCase();
-    if (r === 'student' || r === 'parent') {
-      window.location.href = 'student-dashboard.html';
-    } else {
+    const r = (role || 'student').toLowerCase();
+    if (r === 'tutor') {
       window.location.href = 'tutor-dashboard.html';
+    } else {
+      window.location.href = 'student-dashboard.html';
     }
   }
 

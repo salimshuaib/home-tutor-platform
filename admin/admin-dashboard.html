@@ -7,7 +7,7 @@
   <meta name="description" content="Admin panel for managing tutor applications, approvals, and platform moderation for Delhi Private Tutors." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.294.0"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -304,7 +304,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- ━━━ SCRIPTS ━━━ -->
-<script>lucide.createIcons();</script>
+<script>if (window.lucide) { lucide.createIcons(); }</script>
 <script type="module">
   import { initAdminAuth, switchSection } from './admin.js';
 
@@ -362,7 +362,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); background: #f8f9fa;">
       <h2 style="margin: 0; font-size: 1.1rem; color: var(--navy);">Verification Document</h2>
       <div style="display: flex; gap: 12px; align-items: center;">
-        <a id="doc-viewer-download" href="#" target="_blank" class="btn btn-outline btn-sm"><i data-lucide="external-link"></i> Open Original</a>
+        <a id="doc-viewer-download" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm"><i data-lucide="external-link"></i> Open Original</a>
         <button class="modal-close" onclick="document.getElementById('doc-viewer-overlay').classList.remove('show')" style="color: var(--text-light);"><i data-lucide="x"></i></button>
       </div>
     </div>

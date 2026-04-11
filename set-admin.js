@@ -1,10 +1,20 @@
 /* 
   Delhi Private Tutors - Admin Setup Script 
   Run this from your terminal to grant admin access.
+  Usage: node set-admin.js <UID> <EMAIL>
 */
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
+
+const TARGET_UID = process.argv[2];
+const TARGET_EMAIL = process.argv[3];
+
+if (!TARGET_UID || !TARGET_EMAIL) {
+  console.error('❌ ERROR: Missing arguments.');
+  console.error('Usage: node set-admin.js <UID> <EMAIL>');
+  process.exit(1);
+}
 
 // 1. Initialize the Admin SDK
 admin.initializeApp({
@@ -12,11 +22,6 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-
-// ━━━ UPDATE THESE TWO VALUES ━━━
-const TARGET_UID = 'Q64pgm1x4sQMyTngCbS0Iq2rPgt1';
-const TARGET_EMAIL = 'delhiprivatehometutor@zohomail.in';
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 async function grantAdmin() {
   console.log(`Attempting to grant admin access to: ${TARGET_EMAIL}...`);
@@ -30,12 +35,12 @@ async function grantAdmin() {
 
     console.log('--------------------------------------------------');
     console.log('✅ SUCCESS: Admin access granted!');
-    console.log('You can now log in at your-site.com/login.html');
+    console.log('You can now log in at the admin dashboard.');
     console.log('--------------------------------------------------');
+    process.exit(0);
   } catch (error) {
     console.error('❌ ERROR granting admin access:', error.message);
-  } finally {
-    process.exit();
+    process.exit(1);
   }
 }
 

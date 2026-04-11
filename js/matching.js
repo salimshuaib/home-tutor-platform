@@ -88,7 +88,7 @@ function locationsMatch(requestLocation, tutorArea, tutorCity) {
 
   // Direct substring match
   if (areaLower && reqLower.includes(areaLower)) return true;
-  if (areaLower && areaLower.includes(reqLower)) return true;
+  if (areaLower && reqLower.length >= 4 && areaLower.includes(reqLower)) return true;
 
   // Check if both are in the same Delhi zone
   for (const [zone, areas] of Object.entries(DELHI_ZONES)) {

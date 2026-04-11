@@ -1824,7 +1824,7 @@
 
     const domain = parts[1].toLowerCase();
 
-    return BLOCKED_DOMAINS.some(blocked => domain.includes(blocked));
+    return BLOCKED_DOMAINS.some(blocked => domain === blocked || domain.endsWith('.' + blocked));
 
   }
 
@@ -2551,9 +2551,10 @@
 
 
 
-        try { await sendEmailVerification(user); } catch (verifyErr) {}
-
-
+        try { await sendEmailVerification(user); } catch (verifyErr) {
+          console.error("Failed to send verification email:", verifyErr);
+          // Flow proceeds to verify-email.html where they can try resending
+        }
 
         sessionStorage.setItem('verifyEmail', email);
 
