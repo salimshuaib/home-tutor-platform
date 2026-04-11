@@ -199,8 +199,8 @@
     .profile-edit-input:focus{outline:none;border-color:var(--saffron)}
     .logo { height: 45px; width: auto; object-fit: contain; }
 </style>
-  <link rel="icon" type="image/png" href="/assets/logo.png">
-  <link rel="shortcut icon" href="/assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" href="assets/logo.png">
 </head>
 <body>
 
@@ -223,7 +223,7 @@
   <div style="display:flex;align-items:center;gap:12px">
     <button class="hamburger" id="hamburger-btn"><i data-lucide="menu"></i></button>
     <a class="nav-logo" href="index.html">
-      <img src="/assets/logo.png" alt="Logo" class="logo">
+      <img src="assets/logo.png" alt="Logo" class="logo">
       <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
     </a>
   </div>
@@ -293,6 +293,7 @@
       <form id="req-form" class="form-grid">
         <div class="form-group"><label class="form-label">Class / Grade *</label><select class="form-select" id="r-class" required><option value="">Select Class</option><option>1st - 5th</option><option>6th - 8th</option><option>9th</option><option>10th</option><option>11th</option><option>12th</option><option>College</option><option>Competitive Exams</option></select></div>
         <div class="form-group"><label class="form-label">Subject *</label><select class="form-select" id="r-subject" required><option value="">Select Subject</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>English</option><option>Hindi</option><option>Computer Science</option><option>Accountancy</option><option>Economics</option><option>All Subjects</option><option>Other</option></select></div>
+        <div class="form-group"><label class="form-label">Board</label><select class="form-select" id="r-board"><option value="">Select Board (Optional)</option><option>CBSE</option><option>ICSE</option><option>State Board</option><option>IB</option><option>Other</option></select></div>
         <div class="form-group"><label class="form-label">Preferred Timing *</label><select class="form-select" id="r-timing" required><option value="">Select Timing</option><option>Morning (8AM - 12PM)</option><option>Afternoon (12PM - 4PM)</option><option>Evening (4PM - 8PM)</option><option>Night (8PM - 10PM)</option><option>Flexible</option></select></div>
         <div class="form-group"><label class="form-label">Monthly Budget (₹) *</label><input class="form-input" type="number" id="r-budget" placeholder="e.g. 8000" required></div>
         <div class="form-group"><label class="form-label">Location / Area *</label><input class="form-input" type="text" id="r-location" placeholder="e.g. Lajpat Nagar, South Delhi" required></div>
@@ -356,6 +357,7 @@
       <input type="hidden" id="edit-id">
       <div class="form-group"><label class="form-label">Class</label><select class="form-select" id="e-class"><option>1st - 5th</option><option>6th - 8th</option><option>9th</option><option>10th</option><option>11th</option><option>12th</option><option>College</option><option>Competitive Exams</option></select></div>
       <div class="form-group"><label class="form-label">Subject</label><select class="form-select" id="e-subject"><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>English</option><option>Hindi</option><option>Computer Science</option><option>Accountancy</option><option>Economics</option><option>All Subjects</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Board</label><select class="form-select" id="e-board"><option value="">Select Board (Optional)</option><option>CBSE</option><option>ICSE</option><option>State Board</option><option>IB</option><option>Other</option></select></div>
       <div class="form-group"><label class="form-label">Timing</label><select class="form-select" id="e-timing"><option>Morning (8AM - 12PM)</option><option>Afternoon (12PM - 4PM)</option><option>Evening (4PM - 8PM)</option><option>Night (8PM - 10PM)</option><option>Flexible</option></select></div>
       <div class="form-group"><label class="form-label">Budget (₹)</label><input class="form-input" type="number" id="e-budget"></div>
       <div class="form-group"><label class="form-label">Location</label><input class="form-input" type="text" id="e-location"></div>
@@ -371,7 +373,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy, serverTimestamp, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
   const app = initializeApp({apiKey:"AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",authDomain:"hometutor-2dbc0.firebaseapp.com",projectId:"hometutor-2dbc0",storageBucket:"hometutor-2dbc0.firebasestorage.app",messagingSenderId:"792391008247",appId:"1:792391008247:web:fa9e76a8caa448351d38f2"});
   const auth = getAuth(app);
@@ -459,7 +461,7 @@
 
   async function loadTutorsFromFirestore() {
     try {
-      const q = query(collection(db, 'users'), where('role', '==', 'tutor'));
+      const q = query(collection(db, 'users'), where('role', '==', 'tutor'), where('status', '==', 'approved'));
       const snap = await getDocs(q);
       allTutors = [];
       snap.forEach(d => {
@@ -537,8 +539,12 @@
   }
 
   /* ── REQUESTS CRUD ── */
+  let unsubRequests = null;
+
   async function loadRequests() {
     if (!currentUser) return;
+
+    // First load
     try {
       const q = query(collection(db, 'requests'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
@@ -547,6 +553,18 @@
     } catch(e) { userRequests = []; }
     renderRequests();
     updateStats();
+
+    // Set up real-time listener for status changes (tutors applying)
+    if (unsubRequests) unsubRequests();
+    try {
+      const q2 = query(collection(db, 'requests'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+      unsubRequests = onSnapshot(q2, (snap) => {
+        userRequests = [];
+        snap.forEach(d => userRequests.push({ id: d.id, ...d.data() }));
+        renderRequests();
+        updateStats();
+      });
+    } catch(e) { /* Listener setup failed, first load still works */ }
   }
 
   function renderRequests(filter = 'all') {
@@ -567,7 +585,8 @@
 
     const html = `<div class="requests-list">${list.map(r => {
       const sc = r.status === 'pending' ? 'status-pending' : r.status === 'active' ? 'status-active' : 'status-closed';
-      const sl = r.status === 'pending' ? 'Pending' : r.status === 'active' ? 'Tutors Contacted' : 'Closed';
+      const tutorsApplied = (r.appliedTutors || []).length;
+      const sl = r.status === 'pending' ? 'Pending' : r.status === 'active' ? (tutorsApplied > 0 ? tutorsApplied + ' Tutor' + (tutorsApplied !== 1 ? 's' : '') + ' Applied' : 'Tutors Contacted') : 'Closed';
       const closedBtn = r.status !== 'closed' ? `<button class="btn btn-outline btn-sm" onclick="markClosed('${r.id}')" title="Mark as closed"><i data-lucide="check-square"></i></button>` : '';
       return `<div class="request-item">
         <div class="req-icon"><i data-lucide="book-open"></i></div>
@@ -583,7 +602,8 @@
     container.innerHTML = html;
     if (filter === 'all') overview.innerHTML = `<div class="requests-list">${list.slice(0,3).map(r => {
       const sc = r.status === 'pending' ? 'status-pending' : r.status === 'active' ? 'status-active' : 'status-closed';
-      const sl = r.status === 'pending' ? 'Pending' : r.status === 'active' ? 'Tutors Contacted' : 'Closed';
+      const tutorsApplied = (r.appliedTutors || []).length;
+      const sl = r.status === 'pending' ? 'Pending' : r.status === 'active' ? (tutorsApplied > 0 ? tutorsApplied + ' Tutor' + (tutorsApplied !== 1 ? 's' : '') + ' Applied' : 'Tutors Contacted') : 'Closed';
       return `<div class="request-item"><div class="req-icon"><i data-lucide="book-open"></i></div><div class="req-details"><h4>${safeText(r.subject)} — ${safeText(r.className)}</h4><p>${safeText(r.mode)} • ${safeText(r.location)}</p></div><span class="req-status ${sc}">${sl}</span></div>`;
     }).join('')}</div>`;
     lucide.createIcons();
@@ -625,6 +645,7 @@
         budget: Number(document.getElementById('r-budget').value), /* BUG 19 */
         location: document.getElementById('r-location').value,
         mode: document.getElementById('r-mode').value,
+        board: document.getElementById('r-board') ? document.getElementById('r-board').value || null : null,
         notes: document.getElementById('r-notes').value,
         status: 'pending',
         createdAt: serverTimestamp()
@@ -666,6 +687,7 @@
         budget: Number(document.getElementById('e-budget').value), /* BUG 19 */
         location: document.getElementById('e-location').value,
         mode: document.getElementById('e-mode').value,
+        board: document.getElementById('e-board') ? document.getElementById('e-board').value || null : null,
         notes: document.getElementById('e-notes').value,
       });
       closeEditModal();

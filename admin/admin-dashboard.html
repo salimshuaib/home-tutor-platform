@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Delhi Private Tutors</title>
+  <meta name="description" content="Admin panel for managing tutor applications, approvals, and platform moderation for Delhi Private Tutors." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --saffron:#E8751A;--saffron-light:#F5954A;--saffron-dark:#C25A08;
+      --navy:#0F1E3C;--navy-mid:#1A2F5A;
+      --cream:#FDF8F3;--gold:#C9922A;--gold-light:#F0C060;
+      --text-dark:#1A1208;--text-mid:#4A3820;--text-light:#8A7360;
+      --white:#FFFFFF;--card-bg:#FFFDF9;
+      --green:#2E7D32;--red:#C62828;
+      --sidebar-w:260px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh}
+
+    /* ━━━ LOADER ━━━ */
+    .loader-overlay{position:fixed;inset:0;background:var(--navy);z-index:2000;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
+    .loader-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--saffron);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{100%{transform:rotate(360deg)}}
+    .loader-error{color:rgba(255,255,255,.7);font-size:.9rem;margin-top:1.5rem;text-align:center;display:none}
+    .loader-error .btn{margin-top:.75rem;color:var(--saffron);border:1px solid var(--saffron);background:transparent;padding:8px 20px;border-radius:8px;cursor:pointer;font-family:inherit}
+
+    /* ━━━ NAVBAR ━━━ */
+    .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:rgba(15,30,60,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(200,146,42,.2)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo{height:45px;width:auto;object-fit:contain}
+    .nav-logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);line-height:1.1}
+    .nav-logo-text span{color:var(--gold-light)}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .nav-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:white;overflow:hidden}
+    .nav-admin-name{font-size:.85rem;font-weight:500;color:rgba(255,255,255,.9)}
+    .admin-badge{background:rgba(232,117,26,.15);color:var(--saffron-light);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase}
+    .nav-logout{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);background:transparent;border:1px solid rgba(255,255,255,.12);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:500;font-family:inherit;transition:.2s}
+    .nav-logout:hover{color:var(--saffron-light);border-color:rgba(232,117,26,.4)}
+    .hamburger{display:none;background:none;border:none;color:white;cursor:pointer}
+    .hamburger i{width:24px;height:24px}
+
+    /* ━━━ SIDEBAR ━━━ */
+    .sidebar{position:fixed;top:64px;left:0;bottom:0;width:var(--sidebar-w);background:var(--white);border-right:1px solid rgba(15,30,60,.08);padding:1.5rem 0;z-index:90;overflow-y:auto;transition:transform .3s}
+    .sidebar-section{padding:0 1rem;margin-bottom:1.5rem}
+    .sidebar-label{font-size:.65rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.1em;padding:0 .75rem;margin-bottom:.5rem}
+    .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px .75rem;border-radius:8px;color:var(--text-mid);font-size:.875rem;font-weight:500;cursor:pointer;transition:.15s;border:none;background:none;width:100%;font-family:inherit;text-align:left}
+    .sidebar-link:hover{background:rgba(232,117,26,.06);color:var(--saffron)}
+    .sidebar-link.active{background:linear-gradient(135deg,rgba(232,117,26,.1),rgba(201,146,42,.06));color:var(--saffron);font-weight:600}
+    .sidebar-link i{width:18px;height:18px;flex-shrink:0}
+    .sidebar-link .badge{margin-left:auto;background:var(--saffron);color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+    .sidebar-backdrop{position:fixed;inset:0;z-index:85;background:rgba(15,30,60,.5);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+    .sidebar-backdrop.open{opacity:1;pointer-events:all}
+
+    /* ━━━ MAIN ━━━ */
+    .main{margin-left:var(--sidebar-w);margin-top:64px;padding:2rem 2.5rem 4rem;min-height:calc(100vh - 64px)}
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+    .page-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:var(--navy)}
+    .page-title em{color:var(--saffron);font-style:italic}
+
+    /* ━━━ STATS ━━━ */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat-card{background:var(--white);border:1px solid rgba(15,30,60,.06);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 12px rgba(0,0,0,.03);transition:.25s}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .stat-icon i{width:20px;height:20px}
+    .stat-icon.orange{background:rgba(232,117,26,.1);color:var(--saffron)}
+    .stat-icon.green{background:rgba(46,125,50,.08);color:var(--green)}
+    .stat-icon.red-bg{background:rgba(198,40,40,.08);color:var(--red)}
+    .stat-icon.blue{background:rgba(26,47,90,.08);color:var(--navy-mid)}
+    .stat-info .stat-num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--navy);line-height:1}
+    .stat-info .stat-label{font-size:.75rem;color:var(--text-light);margin-top:4px}
+
+    /* ━━━ CARDS ━━━ */
+    .card{background:var(--white);border:1px solid rgba(15,30,60,.06);border-radius:16px;padding:1.5rem;box-shadow:0 4px 20px rgba(0,0,0,.03);margin-bottom:1.5rem}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+    .card-title{font-size:1.1rem;font-weight:700;color:var(--navy)}
+
+    /* ━━━ TUTOR CARDS (Pending) ━━━ */
+    .tutor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem}
+    .tutor-card{background:var(--card-bg);border:1px solid rgba(15,30,60,.06);border-radius:14px;padding:1.5rem;transition:.25s;position:relative;overflow:hidden}
+    .tutor-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:rgba(232,117,26,.2)}
+    .tutor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--saffron),var(--gold));transform:scaleX(0);transform-origin:left;transition:.3s}
+    .tutor-card:hover::before{transform:scaleX(1)}
+    .tutor-card-top{display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start}
+    .tutor-card-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-family:'Playfair Display',serif;font-weight:700;font-size:1.2rem;flex-shrink:0;overflow:hidden}
+    .tutor-card-avatar img,.tutor-card-avatar-img{width:100%;height:100%;object-fit:cover;border-radius:14px}
+    .tutor-card-info{flex:1;min-width:0}
+    .tutor-card-info h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+    .tutor-card-email{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-light)}
+    .tutor-card-email i{width:13px;height:13px}
+    .tutor-card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+    .meta-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:.72rem;font-weight:600;background:rgba(15,30,60,.04);color:var(--text-mid)}
+    .meta-tag i{width:12px;height:12px;flex-shrink:0}
+    .tutor-card-docs{margin-bottom:1rem}
+    .no-doc{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;color:var(--text-light)}
+    .no-doc i{width:14px;height:14px}
+    .tutor-card-actions{display:flex;gap:.5rem;padding-top:.75rem;border-top:1px solid rgba(15,30,60,.06)}
+
+    /* ━━━ TUTOR LIST (Approved/Rejected) ━━━ */
+    .tutor-list{display:flex;flex-direction:column;gap:.75rem}
+    .tutor-list-item{display:flex;align-items:center;gap:1rem;padding:1.25rem;background:var(--card-bg);border:1px solid rgba(15,30,60,.06);border-radius:12px;transition:.2s}
+    .tutor-list-item:hover{border-color:rgba(232,117,26,.15);box-shadow:0 4px 16px rgba(0,0,0,.04)}
+    .tutor-list-avatar{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-weight:700;font-size:.85rem;flex-shrink:0;overflow:hidden}
+    .tutor-list-avatar img{width:100%;height:100%;object-fit:cover}
+    .tutor-list-info{flex:1;min-width:0}
+    .tutor-list-info h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:2px}
+    .tutor-list-info p{font-size:.78rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .rejection-reason{margin-top:6px;font-size:.78rem;color:var(--red);background:rgba(198,40,40,.04);padding:6px 10px;border-radius:6px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+    .rejection-reason i{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+    .tutor-list-meta{text-align:right;flex-shrink:0}
+    .review-date{display:flex;align-items:center;gap:4px;font-size:.75rem;color:var(--text-light)}
+    .review-date i{width:13px;height:13px}
+
+    /* ━━━ BUTTONS ━━━ */
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.875rem;cursor:pointer;transition:.25s;border:none;font-family:inherit;text-decoration:none}
+    .btn-primary{background:linear-gradient(135deg,var(--saffron),var(--saffron-dark));color:white;box-shadow:0 4px 16px rgba(232,117,26,.25)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,117,26,.4)}
+    .btn-outline{background:transparent;border:1.5px solid rgba(15,30,60,.15);color:var(--text-dark)}
+    .btn-outline:hover{border-color:var(--saffron);color:var(--saffron)}
+    .btn-sm{padding:6px 14px;font-size:.8rem}
+    .btn i{width:16px;height:16px}
+    .btn-approve{background:rgba(46,125,50,.08);color:var(--green);border:1.5px solid rgba(46,125,50,.2);flex:1;justify-content:center}
+    .btn-approve:hover{background:var(--green);color:white;border-color:var(--green)}
+    .btn-approve:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-reject{background:rgba(198,40,40,.06);color:var(--red);border:1.5px solid rgba(198,40,40,.15);flex:1;justify-content:center}
+    .btn-reject:hover{background:var(--red);color:white;border-color:var(--red)}
+    .btn-reject:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-danger-solid{background:var(--red);color:white;border:none}
+    .btn-danger-solid:hover{background:#b71c1c}
+
+    /* ━━━ MODAL ━━━ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,30,60,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--white);border-radius:20px;padding:2rem;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.2);animation:modalIn .25s ease}
+    @keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+    .modal-header h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--navy)}
+    .modal-close{background:none;border:none;cursor:pointer;color:var(--text-light);transition:.2s}
+    .modal-close:hover{color:var(--saffron)}
+    .modal-close i{width:22px;height:22px}
+    .modal-body p{font-size:.9rem;color:var(--text-mid);margin-bottom:1rem;line-height:1.5}
+    .modal-body textarea{width:100%;padding:12px 14px;border:1.5px solid rgba(15,30,60,.12);border-radius:8px;font-size:.875rem;font-family:inherit;color:var(--text-dark);background:var(--cream);resize:vertical;min-height:100px;transition:.2s;outline:none}
+    .modal-body textarea:focus{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,117,26,.08)}
+    .modal-body textarea::placeholder{color:var(--text-light)}
+    .modal-actions{display:flex;gap:.75rem;margin-top:1.5rem}
+    .modal-actions .btn{flex:1;justify-content:center}
+
+    /* ━━━ TOAST ━━━ */
+    .toast{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);padding:14px 24px;border-radius:12px;font-size:.875rem;font-weight:600;display:flex;align-items:center;gap:8px;z-index:300;transition:bottom .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.15);max-width:500px}
+    .toast.show{bottom:32px}
+    .toast i{width:18px;height:18px;flex-shrink:0}
+    .toast-success{background:var(--green);color:white}
+    .toast-error{background:var(--red);color:white}
+
+    /* ━━━ EMPTY STATE ━━━ */
+    .empty-state{text-align:center;padding:3rem 2rem}
+    .empty-state i{width:48px;height:48px;color:var(--gold-light);opacity:.6;margin-bottom:1rem}
+    .empty-state h3{font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem}
+    .empty-state p{color:var(--text-light);font-size:.875rem;max-width:400px;margin:0 auto}
+
+    /* ━━━ SECTIONS ━━━ */
+    .section{display:none}
+    .section.active{display:block}
+
+    /* ━━━ SPIN ANIMATION ━━━ */
+    .spin{animation:spin 1s linear infinite}
+
+    /* ━━━ RESPONSIVE ━━━ */
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0);box-shadow:8px 0 30px rgba(0,0,0,.1)}
+      .main{margin-left:0}
+      .hamburger{display:block}
+      .tutor-grid{grid-template-columns:1fr}
+      .stats-row{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:600px){
+      .top-nav{padding:0 1rem}
+      .main{padding:1.5rem 1rem 3rem}
+      .page-title{font-size:1.4rem}
+      .stats-row{grid-template-columns:1fr}
+      .nav-admin-name{display:none}
+      .tutor-card-actions{flex-direction:column}
+    }
+  </style>
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+  <link rel="shortcut icon" href="../assets/logo.png">
+</head>
+<body>
+
+<!-- ━━━ LOADER ━━━ -->
+<div class="loader-overlay" id="loader">
+  <div>
+    <div class="loader-spinner"></div>
+    <div class="loader-error" id="loader-error">
+      <p>Loading is taking too long.</p>
+      <button class="btn" onclick="window.location.reload()">Retry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar Backdrop -->
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<!-- ━━━ NAVBAR ━━━ -->
+<header class="top-nav">
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="hamburger" id="hamburger-btn"><i data-lucide="menu"></i></button>
+    <a class="nav-logo" href="../index.html">
+      <img src="../assets/logo.png" alt="Logo" class="logo">
+      <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
+    </a>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:10px;color:white">
+      <div class="nav-avatar" id="nav-admin-avatar">A</div>
+      <span class="nav-admin-name" id="nav-admin-name">Admin</span>
+    </div>
+    <button class="nav-logout" id="logout-btn"><i data-lucide="log-out"></i> Logout</button>
+  </div>
+</header>
+
+<!-- ━━━ SIDEBAR ━━━ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Moderation</div>
+    <button class="sidebar-link active" data-section="overview"><i data-lucide="layout-dashboard"></i> Overview</button>
+    <button class="sidebar-link" data-section="pending"><i data-lucide="clock"></i> Pending Tutors <span class="badge" id="pending-badge" style="display:none">0</span></button>
+    <button class="sidebar-link" data-section="approved"><i data-lucide="check-circle"></i> Approved Tutors</button>
+    <button class="sidebar-link" data-section="rejected"><i data-lucide="x-circle"></i> Rejected Tutors</button>
+  </div>
+</aside>
+
+<!-- ━━━ MAIN CONTENT ━━━ -->
+<main class="main">
+
+  <!-- ── OVERVIEW ── -->
+  <div class="section active" id="sec-overview">
+    <div class="page-header">
+      <h1 class="page-title">Admin <em>Overview</em></h1>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon orange"><i data-lucide="clock"></i></div><div class="stat-info"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending Review</div></div></div>
+      <div class="stat-card"><div class="stat-icon green"><i data-lucide="check-circle"></i></div><div class="stat-info"><div class="stat-num" id="stat-approved">0</div><div class="stat-label">Approved Tutors</div></div></div>
+      <div class="stat-card"><div class="stat-icon red-bg"><i data-lucide="x-circle"></i></div><div class="stat-info"><div class="stat-num" id="stat-rejected">0</div><div class="stat-label">Rejected</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue"><i data-lucide="users"></i></div><div class="stat-info"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Tutors</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Recent Pending Applications</h3><button class="btn btn-outline btn-sm" onclick="window.adminActions.switchSection('pending')"><i data-lucide="arrow-right"></i> View All</button></div>
+      <div id="overview-recent">
+        <div class="empty-state"><i data-lucide="inbox"></i><h3>No pending applications</h3><p>All tutor applications have been reviewed.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PENDING ── -->
+  <div class="section" id="sec-pending">
+    <div class="page-header"><h1 class="page-title">Pending <em>Applications</em></h1></div>
+    <div id="pending-container">
+      <div class="empty-state"><i data-lucide="inbox"></i><h3>Loading...</h3><p>Fetching pending tutor applications.</p></div>
+    </div>
+  </div>
+
+  <!-- ── APPROVED ── -->
+  <div class="section" id="sec-approved">
+    <div class="page-header"><h1 class="page-title">Approved <em>Tutors</em></h1></div>
+    <div id="approved-container">
+      <div class="empty-state"><i data-lucide="inbox"></i><h3>Loading...</h3><p>Fetching approved tutors.</p></div>
+    </div>
+  </div>
+
+  <!-- ── REJECTED ── -->
+  <div class="section" id="sec-rejected">
+    <div class="page-header"><h1 class="page-title">Rejected <em>Applications</em></h1></div>
+    <div id="rejected-container">
+      <div class="empty-state"><i data-lucide="inbox"></i><h3>Loading...</h3><p>Fetching rejected applications.</p></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ━━━ REJECT MODAL ━━━ -->
+<div class="modal-overlay" id="reject-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Reject Application</h2>
+      <button class="modal-close" onclick="window.adminActions.closeRejectModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>You are rejecting the application of <strong id="reject-tutor-name">—</strong>. Please provide a reason:</p>
+      <textarea id="reject-reason" placeholder="e.g. Incomplete documentation, unverified credentials, missing profile photo..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="window.adminActions.closeRejectModal()">Cancel</button>
+      <button class="btn btn-danger-solid" id="confirm-reject-btn" onclick="window.adminActions.confirmReject()"><i data-lucide="x"></i> Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━ TOAST ━━━ -->
+<div class="toast" id="toast"></div>
+
+<!-- ━━━ SCRIPTS ━━━ -->
+<script>lucide.createIcons();</script>
+<script type="module">
+  import { initAdminAuth, switchSection } from './admin/admin.js';
+
+  // Initialize admin auth guard
+  initAdminAuth();
+
+  // Sidebar navigation
+  document.querySelectorAll('.sidebar-link').forEach(l => {
+    l.addEventListener('click', () => switchSection(l.dataset.section));
+  });
+
+  // Mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  document.getElementById('hamburger-btn').addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('open');
+  });
+  backdrop.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('open');
+  });
+</script>
+</body>
+</html>

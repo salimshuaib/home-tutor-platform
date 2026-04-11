@@ -614,15 +614,15 @@
       }
     }
   </style>
-  <link rel="icon" type="image/png" href="/assets/logo.png">
-  <link rel="shortcut icon" href="/assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" href="assets/logo.png">
 </head>
 <body>
 
 <!-- ── NAVIGATION ── -->
 <nav>
   <a class="nav-logo" href="index.html">
-    <img src="/assets/logo.png" alt="Logo" class="logo">
+    <img src="assets/logo.png" alt="Logo" class="logo">
     <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
   </a>
   <a class="nav-back" href="index.html">
@@ -641,7 +641,7 @@
     <!-- LEFT — Branding Panel -->
     <div class="login-branding">
       <div class="branding-content">
-        <img src="/assets/logo.png" alt="Logo" class="logo" style="height: 64px; margin-bottom: 28px;">
+        <img src="assets/logo.png" alt="Logo" class="logo" style="height: 64px; margin-bottom: 28px;">
         <h1 class="branding-heading" id="branding-heading">
           Find the <span class="accent">Right Tutor</span>
         </h1>
@@ -812,12 +812,15 @@
     const r = (role || '').toLowerCase();
     if (r === 'student' || r === 'parent') return 'student';
     if (r === 'tutor') return 'tutor';
+    if (r === 'admin') return 'admin';
     return null;
   }
 
   function redirectUser(role) {
     const r = normalizeRole(role);
-    if (r === 'tutor') {
+    if (r === 'admin') {
+      window.location.href = 'admin-dashboard.html';
+    } else if (r === 'tutor') {
       window.location.href = 'tutor-dashboard.html';
     } else if (r === 'student') {
       window.location.href = 'student-dashboard.html';
@@ -941,6 +944,15 @@
         const userDoc = await getDoc(userDocRef);
         
         if (userDoc.exists()) {
+          // Check if user is an admin first
+          try {
+            const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+            if (adminDoc.exists() && adminDoc.data().role === 'admin') {
+              window.location.href = 'admin-dashboard.html';
+              return;
+            }
+          } catch(adminErr) { /* Not an admin, continue normally */ }
+
           const role = userDoc.data().role;
           if (!role) {
             window.location.href = 'select-role.html';
@@ -1238,13 +1250,25 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        await setDoc(doc(db, 'users', user.uid), {
+        const userData = {
           role: role,
           fullName: fullName,
           email: email,
           phone: phone,
           createdAt: serverTimestamp()
-        });
+        };
+
+        // Add tutor-specific status fields
+        if (role === 'tutor') {
+          userData.status = 'pending';
+          userData.submittedAt = serverTimestamp();
+          userData.rejectionReason = null;
+          userData.reviewedAt = null;
+          userData.profileImageUrl = null;
+          userData.documentUrl = null;
+        }
+
+        await setDoc(doc(db, 'users', user.uid), userData);
 
         try { await sendEmailVerification(user); } catch (verifyErr) {}
 

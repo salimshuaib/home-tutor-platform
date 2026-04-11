@@ -21,7 +21,6 @@
     .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:rgba(15,30,60,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(200,146,42,.2)}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
     .nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center}
-    
     .nav-logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);line-height:1.1}
     .nav-logo-text span{color:var(--gold-light)}
     .nav-right{display:flex;align-items:center;gap:16px}
@@ -129,6 +128,7 @@
     .file-upload i{width:28px;height:28px;color:var(--text-light);margin-bottom:.5rem}
     .file-upload p{font-size:.8rem;color:var(--text-light)}
     .file-upload .file-name{font-size:.8rem;color:var(--saffron);font-weight:600;margin-top:.5rem}
+    .file-error{color:var(--red);font-size:.75rem;margin-top:4px;display:none}
 
     /* TABS */
     .tab-bar{display:flex;gap:4px;background:rgba(15,30,60,.04);border-radius:10px;padding:4px;margin-bottom:1.5rem;overflow-x:auto}
@@ -190,9 +190,41 @@
     .section{display:none}
     .section.active{display:block}
     .logo { height: 45px; width: auto; object-fit: contain; }
-</style>
-  <link rel="icon" type="image/png" href="/assets/logo.png">
-  <link rel="shortcut icon" href="/assets/logo.png">
+
+    /* ━━━ STATUS BANNER ━━━ */
+    .status-banner{padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:500;line-height:1.5;animation:fadeIn .4s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .status-banner i{width:22px;height:22px;flex-shrink:0}
+    .status-banner.pending{background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1px solid #FFD54F;color:#F57F17}
+    .status-banner.approved{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border:1px solid #81C784;color:#2E7D32}
+    .status-banner.rejected{background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border:1px solid #EF9A9A;color:#C62828}
+    .status-banner .banner-content{flex:1}
+    .status-banner .banner-title{font-weight:700;margin-bottom:2px}
+    .status-banner .banner-text{font-size:.82rem;opacity:.85}
+    .status-banner .btn-reapply{margin-left:auto;padding:8px 18px;background:var(--red);color:white;border:none;border-radius:8px;font-weight:600;font-size:.82rem;cursor:pointer;font-family:inherit;transition:.2s;flex-shrink:0}
+    .status-banner .btn-reapply:hover{background:#b71c1c;transform:translateY(-1px)}
+
+    /* MATCH SCORE BADGE */
+    .match-score{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:.7rem;font-weight:700;margin-left:auto}
+    .match-score i{width:12px;height:12px}
+    .match-score.excellent{background:rgba(46,125,50,.1);color:var(--green)}
+    .match-score.good{background:rgba(232,117,26,.1);color:var(--saffron)}
+    .match-score.fair{background:rgba(26,47,90,.08);color:var(--navy-mid)}
+    .match-score.low{background:rgba(138,115,96,.08);color:var(--text-light)}
+    .lead-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+    .lead-board-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:700;background:rgba(201,146,42,.1);color:var(--gold);margin-left:4px}
+    .match-breakdown{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.75rem}
+    .match-chip{padding:2px 8px;border-radius:4px;font-size:.6rem;font-weight:600;background:rgba(46,125,50,.06);color:var(--green);border:1px solid rgba(46,125,50,.1)}
+    .match-chip.missed{background:rgba(138,115,96,.04);color:var(--text-light);border-color:rgba(138,115,96,.08);text-decoration:line-through;opacity:.5}
+    /* TOAST */
+    .toast{position:fixed;top:80px;right:20px;z-index:9999;padding:14px 24px;border-radius:12px;font-size:.875rem;font-weight:600;color:white;box-shadow:0 8px 32px rgba(0,0,0,.15);animation:toastIn .4s ease;display:flex;align-items:center;gap:10px}
+    .toast.success{background:linear-gradient(135deg,var(--green),#388E3C)}
+    .toast.error{background:linear-gradient(135deg,var(--red),#D32F2F)}
+    .toast i{width:18px;height:18px}
+    @keyframes toastIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+  </style>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="shortcut icon" href="assets/logo.png">
 </head>
 <body>
 
@@ -215,7 +247,7 @@
   <div style="display:flex;align-items:center;gap:12px">
     <button class="hamburger" id="hamburger-btn"><i data-lucide="menu"></i></button>
     <a class="nav-logo" href="index.html">
-      <img src="/assets/logo.png" alt="Logo" class="logo">
+      <img src="assets/logo.png" alt="Logo" class="logo">
       <div class="nav-logo-text">Delhi <span>Private</span><br>Tutors</div>
     </a>
   </div>
@@ -249,6 +281,9 @@
 
 <!-- MAIN -->
 <main class="main">
+
+  <!-- STATUS BANNER -->
+  <div id="status-banner"></div>
 
   <!-- OVERVIEW -->
   <div class="section active" id="sec-overview">
@@ -368,10 +403,11 @@
           <label class="form-label">Profile Photo</label>
           <div class="file-upload" id="photo-upload">
             <i data-lucide="camera"></i>
-            <p>Click to upload (JPG only, max 5MB)</p>
+            <p>Click to upload (JPG/PNG, max 5MB)</p>
             <div class="file-name" id="photo-name"></div>
-            <input type="file" accept=".jpg,.jpeg" id="p-photo">
+            <input type="file" accept=".jpg,.jpeg,.png" id="p-photo">
           </div>
+          <div class="file-error" id="photo-error"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Education Certificate</label>
@@ -381,6 +417,7 @@
             <div class="file-name" id="cert-name"></div>
             <input type="file" accept=".jpg,.jpeg,.pdf" id="p-cert">
           </div>
+          <div class="file-error" id="cert-error"></div>
         </div>
       </div>
     </div>
@@ -408,15 +445,20 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+  import { matchAndScoreRequests, getMatchColor } from "./js/matching.js";
 
   const app = initializeApp({apiKey:"AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",authDomain:"hometutor-2dbc0.firebaseapp.com",projectId:"hometutor-2dbc0",storageBucket:"hometutor-2dbc0.firebasestorage.app",messagingSenderId:"792391008247",appId:"1:792391008247:web:fa9e76a8caa448351d38f2"});
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   let currentUser = null;
   let tutorProfile = {};
   let acceptedLeads = [];
+  let appliedRequestIds = [];
+  let matchedResults = [];
 
   /* ── CHECK-PILL TOGGLE ── */
   document.querySelectorAll('.check-pill input').forEach(inp => {
@@ -424,18 +466,24 @@
   });
 
   /* ── FILE UPLOAD VALIDATION ── */
+  function showFileError(id, msg) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
+  }
   document.getElementById('p-photo').addEventListener('change', function() {
+    showFileError('photo-error', '');
     const f = this.files[0];
     if (!f) return;
-    if (!f.type.match(/image\/jpe?g/)) { alert('Profile photo must be JPG format.'); this.value = ''; return; }
-    if (f.size > 5 * 1024 * 1024) { alert('Photo must be under 5MB.'); this.value = ''; return; }
+    if (!f.type.match(/image\/(jpe?g|png)/)) { showFileError('photo-error', 'Profile photo must be JPG or PNG format.'); this.value = ''; return; }
+    if (f.size > 5 * 1024 * 1024) { showFileError('photo-error', 'Photo must be under 5MB.'); this.value = ''; return; }
     document.getElementById('photo-name').textContent = f.name;
   });
   document.getElementById('p-cert').addEventListener('change', function() {
+    showFileError('cert-error', '');
     const f = this.files[0];
     if (!f) return;
-    if (!f.type.match(/image\/jpe?g/) && f.type !== 'application/pdf') { alert('Certificate must be JPG or PDF.'); this.value = ''; return; }
-    if (f.size > 6 * 1024 * 1024) { alert('Certificate must be under 6MB.'); this.value = ''; return; }
+    if (!f.type.match(/image\/jpe?g/) && f.type !== 'application/pdf') { showFileError('cert-error', 'Certificate must be JPG or PDF format.'); this.value = ''; return; }
+    if (f.size > 6 * 1024 * 1024) { showFileError('cert-error', 'Certificate must be under 6MB.'); this.value = ''; return; }
     document.getElementById('cert-name').textContent = f.name;
   });
 
@@ -445,7 +493,21 @@
     if (errEl) errEl.style.display = 'block';
   }, 10000);
 
+  /* ── TOAST NOTIFICATIONS ── */
+  function showToast(msg, type = 'success') {
+    const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i data-lucide="${icon}"></i>${msg}`;
+    document.body.appendChild(toast);
+    lucide.createIcons();
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 3500);
+  }
+
   /* ── AUTH ── */
+  let unsubProfile = null;
+  let unsubRequests = null;
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.replace('login.html?role=tutor'); return; }
     const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
@@ -462,6 +524,8 @@
         tutorProfile = d;
         displayName = d.fullName || user.displayName || 'Tutor';
         populateProfile(d, user);
+        renderStatusBanner(d);
+        gateLeadAccess(d.status);
       }
     } catch(e) { /* silenced BUG 17 */ }
 
@@ -473,17 +537,93 @@
     updateProfileCompletion();
 
     await loadLeads();
-    await loadMatches();
+    startMatchesListener();
+
+    // Real-time listener for profile/status changes
+    if (unsubProfile) unsubProfile();
+    unsubProfile = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
+      if (docSnap.exists()) {
+        const d = docSnap.data();
+        tutorProfile = d;
+        renderStatusBanner(d);
+        gateLeadAccess(d.status);
+      }
+    });
 
     clearTimeout(loaderTimeout);
     document.getElementById('loader').style.opacity = '0';
     setTimeout(() => document.getElementById('loader').style.display = 'none', 400);
   });
 
+  /* ── STATUS BANNER ── */
+  function renderStatusBanner(profile) {
+    const banner = document.getElementById('status-banner');
+    if (!banner) return;
+    const status = profile.status || 'pending';
+
+    if (status === 'pending') {
+      banner.innerHTML = `
+        <div class="status-banner pending">
+          <i data-lucide="clock"></i>
+          <div class="banner-content">
+            <div class="banner-title">Profile Under Review</div>
+            <div class="banner-text">Your application is being reviewed by our team. You'll be notified once a decision is made.</div>
+          </div>
+        </div>`;
+    } else if (status === 'approved') {
+      banner.innerHTML = `
+        <div class="status-banner approved">
+          <i data-lucide="check-circle"></i>
+          <div class="banner-content">
+            <div class="banner-title">Profile Approved!</div>
+            <div class="banner-text">Congratulations! You're verified and can now access student leads.</div>
+          </div>
+        </div>`;
+    } else if (status === 'rejected') {
+      const reason = profile.rejectionReason ? safeText(profile.rejectionReason) : 'No reason provided';
+      banner.innerHTML = `
+        <div class="status-banner rejected">
+          <i data-lucide="alert-circle"></i>
+          <div class="banner-content">
+            <div class="banner-title">Profile Rejected</div>
+            <div class="banner-text">Reason: ${reason}</div>
+          </div>
+          <button class="btn-reapply" onclick="handleReapply()">Update Profile & Reapply</button>
+        </div>`;
+    }
+    lucide.createIcons();
+  }
+
+  /* ── LEAD ACCESS GATE ── */
+  function gateLeadAccess(status) {
+    if (status !== 'approved') {
+      const gateMsg = status === 'rejected'
+        ? 'Your profile was rejected. Update your profile and reapply to access leads.'
+        : 'Your profile is under review. You\'ll be able to browse leads once approved.';
+      document.getElementById('matches-container').innerHTML = `
+        <div class="empty-state">
+          <i data-lucide="lock"></i>
+          <h3>Access Restricted</h3>
+          <p>${gateMsg}</p>
+          <button class="btn btn-primary" onclick="switchSection('profile')"><i data-lucide="user-cog"></i> ${status === 'rejected' ? 'Update Profile' : 'View Profile'}</button>
+        </div>`;
+      lucide.createIcons();
+    }
+  }
+
+  /* ── RE-APPLICATION ── */
+  window.handleReapply = function() {
+    switchSection('profile');
+    showMsg('profile-msg', 'Update your profile information and click "Save & Reapply" to submit for review again.', 'success');
+    const saveBtn = document.getElementById('save-profile-btn');
+    saveBtn.innerHTML = '<i data-lucide="send"></i> Save & Reapply';
+    saveBtn.dataset.reapply = 'true';
+    lucide.createIcons();
+  };
+
   /* ── POPULATE PROFILE FORM ── */
   function populateProfile(d, user) {
     document.getElementById('p-name').value = d.fullName || '';
-    /* BUG 21: Email field is read-only, always use auth email */
     document.getElementById('p-email').value = (user ? user.email : d.email) || '';
     document.getElementById('p-phone').value = d.phone || '';
     document.getElementById('p-experience').value = d.experience || '';
@@ -493,11 +633,13 @@
     document.getElementById('p-city').value = d.city || 'New Delhi';
     document.getElementById('p-fee').value = d.fee || '';
 
-    // Restore checkboxes
     (d.boards || []).forEach(v => { const el = document.querySelector(`#boards-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
     (d.subjects || []).forEach(v => { const el = document.querySelector(`#subjects-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
     (d.classes || []).forEach(v => { const el = document.querySelector(`#classes-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
     (d.mode || []).forEach(v => { const el = document.querySelector(`#mode-group input[value="${v}"]`); if(el){el.checked=true;el.closest('.check-pill').classList.add('selected')} });
+
+    if (d.profileImageUrl) document.getElementById('photo-name').textContent = '✓ Photo uploaded';
+    if (d.documentUrl) document.getElementById('cert-name').textContent = '✓ Certificate uploaded';
   }
 
   /* ── PROFILE COMPLETION ── */
@@ -516,6 +658,7 @@
   /* ── SAVE PROFILE ── */
   document.getElementById('save-profile-btn').addEventListener('click', async () => {
     const btn = document.getElementById('save-profile-btn');
+    const isReapply = btn.dataset.reapply === 'true';
     btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Saving...'; lucide.createIcons();
 
     const getChecked = (groupId) => [...document.querySelectorAll(`#${groupId} input:checked`)].map(i => i.value);
@@ -523,13 +666,13 @@
       fullName: document.getElementById('p-name').value.trim(),
       email: document.getElementById('p-email').value.trim(),
       phone: document.getElementById('p-phone').value.trim(),
-      experience: Number(document.getElementById('p-experience').value) || 0, /* BUG 19 */
+      experience: Number(document.getElementById('p-experience').value) || 0,
       tagline: document.getElementById('p-tagline').value.trim(),
       bio: document.getElementById('p-bio').value.trim(),
       area: document.getElementById('p-area').value.trim(),
       city: document.getElementById('p-city').value.trim(),
-      fee: Number(document.getElementById('p-fee').value) || 0, /* BUG 19 */
-      preferredLocation: document.getElementById('p-area').value.trim(), /* for student search */
+      fee: Number(document.getElementById('p-fee').value) || 0,
+      preferredLocation: document.getElementById('p-area').value.trim(),
       boards: getChecked('boards-group'),
       subjects: getChecked('subjects-group'),
       classes: getChecked('classes-group'),
@@ -537,58 +680,131 @@
       updatedAt: serverTimestamp()
     };
 
+    if (isReapply) {
+      data.status = 'pending';
+      data.rejectionReason = null;
+      data.submittedAt = serverTimestamp();
+    }
+
     try {
+      const photoFile = document.getElementById('p-photo').files[0];
+      if (photoFile) {
+        try {
+          const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.${photoFile.name.split('.').pop()}`);
+          await uploadBytes(photoRef, photoFile);
+          data.profileImageUrl = await getDownloadURL(photoRef);
+        } catch(uploadErr) {
+          console.error('Photo upload failed:', uploadErr);
+        }
+      }
+
+      const certFile = document.getElementById('p-cert').files[0];
+      if (certFile) {
+        try {
+          const certRef = ref(storage, `tutors/${currentUser.uid}/certificate.${certFile.name.split('.').pop()}`);
+          await uploadBytes(certRef, certFile);
+          data.documentUrl = await getDownloadURL(certRef);
+        } catch(uploadErr) {
+          console.error('Certificate upload failed:', uploadErr);
+        }
+      }
+
       await updateDoc(doc(db, 'users', currentUser.uid), data);
       tutorProfile = { ...tutorProfile, ...data };
       updateProfileCompletion();
-      showMsg('profile-msg', 'Profile saved successfully!', 'success');
+
+      if (isReapply) {
+        showMsg('profile-msg', 'Profile resubmitted for review! You will be notified when your application is reviewed.', 'success');
+        btn.dataset.reapply = 'false';
+      } else {
+        showMsg('profile-msg', 'Profile saved successfully!', 'success');
+      }
+
       const first = data.fullName.split(' ')[0] || 'Tutor';
       document.getElementById('nav-user-name').textContent = first;
       document.getElementById('welcome-name').textContent = first;
-      await loadMatches();
     } catch(e) {
       showMsg('profile-msg', 'Failed to save profile. Please try again.', 'error');
     }
-    btn.disabled = false; btn.innerHTML = '<i data-lucide="save"></i> Save Profile'; lucide.createIcons();
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Save Profile';
+    btn.dataset.reapply = 'false';
+    lucide.createIcons();
   });
 
-  /* ── LOAD MATCHES ── */
-  async function loadMatches() {
-    try {
-      const q = query(collection(db, 'requests'), where('status', '==', 'pending'), orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      const all = []; snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     SMART MATCHING — REAL-TIME SCORED
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-      // Filter by tutor profile
-      const matched = all.filter(r => {
-        if (!tutorProfile.subjects || tutorProfile.subjects.length === 0) return true; // show all if no profile
-        return tutorProfile.subjects.some(s => s.toLowerCase() === (r.subject || '').toLowerCase());
-      });
+  function startMatchesListener() {
+    // If not approved, don't set up listener
+    if (tutorProfile.status && tutorProfile.status !== 'approved') return;
 
-      document.getElementById('s-matches').textContent = matched.length;
+    if (unsubRequests) unsubRequests();
+
+    // Real-time listener on all open/pending requests
+    const q = query(collection(db, 'requests'), where('status', 'in', ['pending', 'active']), orderBy('createdAt', 'desc'));
+
+    unsubRequests = onSnapshot(q, async (snapshot) => {
+      const allRequests = [];
+      snapshot.forEach(d => allRequests.push({ id: d.id, ...d.data() }));
+
+      // Get tutor's already-applied request IDs
+      try {
+        const leadsQ = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid));
+        const leadsSnap = await getDocs(leadsQ);
+        appliedRequestIds = [];
+        leadsSnap.forEach(d => appliedRequestIds.push(d.data().requestId));
+      } catch(e) { appliedRequestIds = []; }
+
+      // Run scoring algorithm
+      matchedResults = matchAndScoreRequests(tutorProfile, allRequests, appliedRequestIds, 15);
+
+      // Update stats
+      document.getElementById('s-matches').textContent = matchedResults.length;
       const badge = document.getElementById('match-badge');
-      if (matched.length > 0) { badge.textContent = matched.length; badge.style.display = 'inline'; }
+      if (matchedResults.length > 0) { badge.textContent = matchedResults.length; badge.style.display = 'inline'; }
       else { badge.style.display = 'none'; }
 
-      renderMatches(matched);
-    } catch(e) { /* silenced BUG 17 */ }
+      renderScoredMatches(matchedResults);
+    }, (err) => { /* Listener error — fallback silently */ });
   }
 
   /* BUG 14: Safe text helper */
   function safeText(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
-  function renderMatches(list) {
+  /* ── RENDER SCORED MATCHES ── */
+  function renderScoredMatches(list) {
     const containers = ['matches-container', 'overview-matches'];
+
+    // Don't overwrite gate if not approved
+    if (tutorProfile.status && tutorProfile.status !== 'approved') return;
+
     if (list.length === 0) {
-      const empty = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No matches yet</h3><p>Complete your profile to receive relevant student requirements.</p></div>`;
+      const empty = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No matches yet</h3><p>Complete your profile with subjects, classes, and location to receive matching student requirements.</p></div>`;
       containers.forEach(id => document.getElementById(id).innerHTML = empty);
       lucide.createIcons(); return;
     }
+
+    // Full matches view
     const html = `<div class="lead-grid">${list.map(r => {
       const modeClass = (r.mode||'').includes('Online') ? 'online' : 'home';
+      const colorClass = getMatchColor(r.matchPercentage);
+      const bd = r.matchBreakdown || {};
       return `<div class="lead-card">
-        <span class="lead-badge ${modeClass}">${safeText(r.mode) || 'Home'}</span>
+        <div class="lead-header">
+          <span class="lead-badge ${modeClass}">${safeText(r.mode) || 'Home'}</span>
+          ${r.board ? `<span class="lead-board-tag">${safeText(r.board)}</span>` : ''}
+          <span class="match-score ${colorClass}"><i data-lucide="target"></i>${r.matchPercentage}% Match</span>
+        </div>
         <div class="lead-title">${safeText(r.subject)} — ${safeText(r.className)}</div>
+        <div class="match-breakdown">
+          ${bd.subject > 0 ? '<span class="match-chip">✓ Subject</span>' : '<span class="match-chip missed">Subject</span>'}
+          ${bd.class > 0 ? '<span class="match-chip">✓ Class</span>' : '<span class="match-chip missed">Class</span>'}
+          ${bd.location > 0 ? '<span class="match-chip">✓ Location</span>' : '<span class="match-chip missed">Location</span>'}
+          ${bd.board > 0 ? '<span class="match-chip">✓ Board</span>' : ''}
+          ${bd.mode > 0 ? '<span class="match-chip">✓ Mode</span>' : '<span class="match-chip missed">Mode</span>'}
+        </div>
         <div class="lead-meta">
           <div class="lead-row"><i data-lucide="map-pin"></i>${safeText(r.location) || 'N/A'}</div>
           <div class="lead-row"><i data-lucide="indian-rupee"></i>₹${Number(r.budget||0).toLocaleString('en-IN')}/mo</div>
@@ -596,37 +812,117 @@
           ${r.notes ? `<div class="lead-row"><i data-lucide="message-circle"></i>${safeText(r.notes)}</div>` : ''}
         </div>
         <div class="lead-actions">
-          <button class="btn btn-success btn-sm" onclick="acceptLead('${r.id}')"><i data-lucide="check"></i> Accept Lead</button>
+          <button class="btn btn-success btn-sm" id="apply-btn-${r.id}" onclick="applyForTuition('${r.id}', ${r.matchScore})"><i data-lucide="send"></i> Apply for this Tuition</button>
           <button class="btn btn-outline btn-sm" onclick="ignoreLead(this)"><i data-lucide="x"></i> Ignore</button>
         </div>
-      </div>`}).join('')}</div>`;
+      </div>`;
+    }).join('')}</div>`;
+
     document.getElementById('matches-container').innerHTML = html;
-    document.getElementById('overview-matches').innerHTML = `<div class="lead-grid">${list.slice(0,3).map(r => `<div class="lead-card">
-      <span class="lead-badge new">New</span><div class="lead-title">${safeText(r.subject)} — ${safeText(r.className)}</div>
-      <div class="lead-meta"><div class="lead-row"><i data-lucide="map-pin"></i>${safeText(r.location)||'N/A'}</div><div class="lead-row"><i data-lucide="indian-rupee"></i>₹${Number(r.budget||0).toLocaleString('en-IN')}/mo</div></div>
-    </div>`).join('')}</div>`;
+
+    // Overview: top 3
+    document.getElementById('overview-matches').innerHTML = `<div class="lead-grid">${list.slice(0,3).map(r => {
+      const colorClass = getMatchColor(r.matchPercentage);
+      return `<div class="lead-card">
+        <div class="lead-header">
+          <span class="lead-badge new">New</span>
+          <span class="match-score ${colorClass}"><i data-lucide="target"></i>${r.matchPercentage}%</span>
+        </div>
+        <div class="lead-title">${safeText(r.subject)} — ${safeText(r.className)}</div>
+        <div class="lead-meta">
+          <div class="lead-row"><i data-lucide="map-pin"></i>${safeText(r.location)||'N/A'}</div>
+          <div class="lead-row"><i data-lucide="indian-rupee"></i>₹${Number(r.budget||0).toLocaleString('en-IN')}/mo</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+
     lucide.createIcons();
   }
 
-  /* ── ACCEPT / IGNORE ── */
-  window.acceptLead = async function(reqId) {
+  /* ── APPLY FOR TUITION ── */
+  window.applyForTuition = async function(reqId, matchScore) {
     if (!currentUser) return;
+
+    // Prevent double-apply
+    if (appliedRequestIds.includes(reqId)) {
+      showToast('You have already applied for this tuition.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('apply-btn-' + reqId);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Applying...'; lucide.createIcons(); }
+
     try {
-      await addDoc(collection(db, 'leads'), { tutorId: currentUser.uid, requestId: reqId, status: 'contacted', acceptedAt: serverTimestamp() });
-      showMsg('profile-msg', 'Lead accepted!', 'success');
-      await loadLeads(); await loadMatches();
-    } catch(e) { showMsg('profile-msg', 'Failed to accept lead.', 'error'); }
+      // 1. Create lead document
+      await addDoc(collection(db, 'leads'), {
+        tutorId: currentUser.uid,
+        tutorName: tutorProfile.fullName || 'Tutor',
+        requestId: reqId,
+        status: 'applied',
+        matchScore: matchScore || 0,
+        appliedAt: serverTimestamp()
+      });
+
+      // 2. Add tutor to request's appliedTutors array & update status
+      try {
+        await updateDoc(doc(db, 'requests', reqId), {
+          appliedTutors: arrayUnion(currentUser.uid),
+          status: 'active'
+        });
+      } catch(updateErr) {
+        // Non-critical: request status update may fail due to rules
+        console.warn('Could not update request appliedTutors:', updateErr);
+      }
+
+      // 3. Update local state
+      appliedRequestIds.push(reqId);
+
+      showToast('Application sent! The student will be notified.', 'success');
+
+      // 4. Remove the applied card from UI
+      if (btn) {
+        const card = btn.closest('.lead-card');
+        if (card) {
+          card.style.transition = 'opacity .3s, transform .3s';
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => card.remove(), 300);
+        }
+      }
+
+      // 5. Refresh leads list
+      await loadLeads();
+    } catch(e) {
+      showToast('Failed to apply. Please try again.', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="send"></i> Apply for this Tuition'; lucide.createIcons(); }
+    }
   };
-  window.ignoreLead = function(btn) { btn.closest('.lead-card').style.display = 'none'; };
+
+  window.ignoreLead = function(btn) {
+    const card = btn.closest('.lead-card');
+    if (card) {
+      card.style.transition = 'opacity .3s, transform .3s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.95)';
+      setTimeout(() => card.remove(), 300);
+    }
+  };
 
   /* ── LOAD LEADS ── */
   async function loadLeads() {
     if (!currentUser) return;
     try {
-      const q = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid), orderBy('acceptedAt', 'desc'));
+      const q = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid), orderBy('appliedAt', 'desc'));
       const snap = await getDocs(q); acceptedLeads = [];
       snap.forEach(d => acceptedLeads.push({ id: d.id, ...d.data() }));
-    } catch(e) { acceptedLeads = []; }
+    } catch(e) {
+      // Fallback: try with old field name for backwards compatibility
+      try {
+        const q2 = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid));
+        const snap2 = await getDocs(q2); acceptedLeads = [];
+        snap2.forEach(d => acceptedLeads.push({ id: d.id, ...d.data() }));
+      } catch(e2) { acceptedLeads = []; }
+    }
     document.getElementById('s-accepted').textContent = acceptedLeads.length;
     document.getElementById('s-ongoing').textContent = acceptedLeads.filter(l => l.status === 'ongoing').length;
     renderLeads();
@@ -636,15 +932,18 @@
     const list = filter === 'all' ? acceptedLeads : acceptedLeads.filter(l => l.status === filter);
     const container = document.getElementById('leads-list');
     if (list.length === 0) {
-      container.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No leads ${filter!=='all'?'with this status':'yet'}</h3><p>Accept matched tuitions to build your pipeline.</p></div>`;
+      container.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><h3>No leads ${filter!=='all'?'with this status':'yet'}</h3><p>Apply for matched tuitions to build your pipeline.</p></div>`;
       lucide.createIcons(); return;
     }
     container.innerHTML = `<div class="leads-list">${list.map(l => {
-      const sc = l.status==='contacted'?'status-contacted':l.status==='ongoing'?'status-ongoing':'status-closed';
-      const sl = l.status==='contacted'?'Contacted':l.status==='ongoing'?'Ongoing':'Closed';
+      const sc = l.status==='applied'?'status-contacted':l.status==='contacted'?'status-contacted':l.status==='ongoing'?'status-ongoing':'status-closed';
+      const sl = l.status==='applied'?'Applied':l.status==='contacted'?'Contacted':l.status==='ongoing'?'Ongoing':'Closed';
+      const timestamp = l.appliedAt || l.acceptedAt;
+      const dateStr = timestamp ? new Date(timestamp.seconds*1000).toLocaleDateString('en-IN') : '';
+      const scoreStr = l.matchScore ? ` • ${Math.round((l.matchScore / 120) * 100)}% match` : '';
       return `<div class="lead-item">
         <div class="lead-item-icon"><i data-lucide="book-open"></i></div>
-        <div class="lead-item-info"><h4>Lead #${l.requestId.substring(0,6)}</h4><p>Accepted ${l.acceptedAt ? new Date(l.acceptedAt.seconds*1000).toLocaleDateString('en-IN') : ''}</p></div>
+        <div class="lead-item-info"><h4>Lead #${l.requestId.substring(0,6)}${scoreStr}</h4><p>Applied ${dateStr}</p></div>
         <span class="lead-status ${sc}">${sl}</span>
       </div>`;
     }).join('')}</div>`;
@@ -692,6 +991,5 @@
     lucide.createIcons();
     setTimeout(() => el.style.display = 'none', 5000);
   }
-</script>
 </body>
 </html>

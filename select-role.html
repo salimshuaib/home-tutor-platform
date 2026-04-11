@@ -216,9 +216,19 @@
       buttons.forEach(btn => btn.style.opacity = '0.5');
       
       try {
-        await updateDoc(doc(db, 'users', currentUser.uid), {
-          role: role
-        });
+        const updateData = { role: role };
+
+        // Add tutor-specific status fields
+        if (role === 'tutor') {
+          updateData.status = 'pending';
+          updateData.submittedAt = new Date();
+          updateData.rejectionReason = null;
+          updateData.reviewedAt = null;
+          updateData.profileImageUrl = null;
+          updateData.documentUrl = null;
+        }
+
+        await updateDoc(doc(db, 'users', currentUser.uid), updateData);
         
         // Success -> redirect
         window.location.href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
