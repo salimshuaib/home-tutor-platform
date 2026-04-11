@@ -1141,82 +1141,72 @@
 
 
   /* ── STATUS BANNER ── */
-
   function renderStatusBanner(profile) {
-
     const banner = document.getElementById('status-banner');
-
     if (!banner) return;
+    const status = profile.status;
+    const isSubmitted = profile.profileSubmitted;
 
-    const status = profile.status || 'pending';
-
-
-
-    if (status === 'pending') {
-
+    if (!isSubmitted || status === null) {
       banner.innerHTML = `
-
+        <div class="status-banner pending" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-color:#64B5F6;color:#1565C0;">
+          <i data-lucide="edit"></i>
+          <div class="banner-content">
+            <div class="banner-title">Welcome to Delhi Private Tutors!</div>
+            <div class="banner-text">Please complete your profile details and upload requested documents to submit your application for review.</div>
+          </div>
+        </div>`;
+      
+      const saveBtn = document.getElementById('save-profile-btn');
+      if (saveBtn) { saveBtn.innerHTML = '<i data-lucide="send"></i> Submit Profile'; saveBtn.dataset.submit = 'true'; }
+    } else if (status === 'pending') {
+      banner.innerHTML = `
         <div class="status-banner pending">
-
           <i data-lucide="clock"></i>
-
           <div class="banner-content">
-
             <div class="banner-title">Profile Under Review</div>
-
             <div class="banner-text">Your application is being reviewed by our team. You'll be notified once a decision is made.</div>
-
           </div>
-
         </div>`;
-
+      const saveBtn = document.getElementById('save-profile-btn');
+      if (saveBtn) { saveBtn.innerHTML = '<i data-lucide="save"></i> Update Profile'; saveBtn.dataset.submit = 'false'; }
     } else if (status === 'approved') {
-
-      banner.innerHTML = `
-
-        <div class="status-banner approved">
-
-          <i data-lucide="check-circle"></i>
-
-          <div class="banner-content">
-
-            <div class="banner-title">Profile Approved!</div>
-
-            <div class="banner-text">Congratulations! You're verified and can now access student leads.</div>
-
-          </div>
-
-        </div>`;
-
+      if (profile.approvalSeen) {
+        banner.innerHTML = '';
+      } else {
+        banner.innerHTML = `
+          <div class="status-banner approved">
+            <i data-lucide="check-circle"></i>
+            <div class="banner-content">
+              <div class="banner-title">Profile Approved!</div>
+              <div class="banner-text">Congratulations! You're verified and can now access student leads.</div>
+            </div>
+            <button class="btn-reapply" style="background:transparent;border:1px solid #81C784;color:#2E7D32;" onclick="dismissApproval()">Dismiss</button>
+          </div>`;
+      }
+      const saveBtn = document.getElementById('save-profile-btn');
+      if (saveBtn) { saveBtn.innerHTML = '<i data-lucide="save"></i> Save Profile'; saveBtn.dataset.submit = 'false'; }
     } else if (status === 'rejected') {
-
       const reason = profile.rejectionReason ? safeText(profile.rejectionReason) : 'No reason provided';
-
       banner.innerHTML = `
-
         <div class="status-banner rejected">
-
           <i data-lucide="alert-circle"></i>
-
           <div class="banner-content">
-
             <div class="banner-title">Profile Rejected</div>
-
             <div class="banner-text">Reason: ${reason}</div>
-
           </div>
-
           <button class="btn-reapply" onclick="handleReapply()">Update Profile & Reapply</button>
-
         </div>`;
-
     }
-
     lucide.createIcons();
-
   }
 
-
+  window.dismissApproval = async function() {
+    try {
+      await updateDoc(doc(db, 'users', currentUser.uid), { approvalSeen: true });
+      document.getElementById('status-banner').innerHTML = '';
+    } catch(e) {}
+  };
 
   /* ── LEAD ACCESS GATE ── */
 
@@ -1341,158 +1331,106 @@
 
 
   /* ── SAVE PROFILE ── */
-
   document.getElementById('save-profile-btn').addEventListener('click', async () => {
-
     const btn = document.getElementById('save-profile-btn');
-
     const isReapply = btn.dataset.reapply === 'true';
+    const isSubmit = btn.dataset.submit === 'true';
+    
+    const photoFile = document.getElementById('p-photo').files[0];
+    const certFile = document.getElementById('p-cert').files[0];
+
+    const getChecked = (groupId) => [...document.querySelectorAll(`#${groupId} input:checked`)].map(i => i.value);
+    
+    const data = {
+      fullName: document.getElementById('p-name').value.trim(),
+      email: document.getElementById('p-email').value.trim(),
+      phone: document.getElementById('p-phone').value.trim(),
+      experience: Number(document.getElementById('p-experience').value) || 0,
+      tagline: document.getElementById('p-tagline').value.trim(),
+      bio: document.getElementById('p-bio').value.trim(),
+      area: document.getElementById('p-area').value.trim(),
+      city: document.getElementById('p-city').value.trim(),
+      fee: Number(document.getElementById('p-fee').value) || 0,
+      preferredLocation: document.getElementById('p-area').value.trim(),
+      boards: getChecked('boards-group'),
+      subjects: getChecked('subjects-group'),
+      classes: getChecked('classes-group'),
+      mode: getChecked('mode-group'),
+      updatedAt: serverTimestamp()
+    };
+
+    if (isSubmit || isReapply) {
+      if (!data.fullName || !data.phone || !data.area || !data.bio || 
+          data.subjects.length === 0 || data.classes.length === 0) {
+        showMsg('profile-msg', 'Please fill in all mandatory fields (Name, Phone, Area, Bio, Subjects, Classes).', 'error');
+        return;
+      }
+      if (!tutorProfile.profileImageUrl && !photoFile) {
+        showMsg('profile-msg', 'Please upload a Profile Photo.', 'error');
+        return;
+      }
+      if (!tutorProfile.documentUrl && !certFile) {
+        showMsg('profile-msg', 'Please upload an Education Certificate.', 'error');
+        return;
+      }
+    }
+
+    if (photoFile && photoFile.size > 5 * 1024 * 1024) { showMsg('profile-msg', 'Photo exceeds 5MB limit.', 'error'); return; }
+    if (certFile && certFile.size > 6 * 1024 * 1024) { showMsg('profile-msg', 'Certificate exceeds 6MB limit.', 'error'); return; }
 
     btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Saving...'; lucide.createIcons();
 
-
-
-    const getChecked = (groupId) => [...document.querySelectorAll(`#${groupId} input:checked`)].map(i => i.value);
-
-    const data = {
-
-      fullName: document.getElementById('p-name').value.trim(),
-
-      email: document.getElementById('p-email').value.trim(),
-
-      phone: document.getElementById('p-phone').value.trim(),
-
-      experience: Number(document.getElementById('p-experience').value) || 0,
-
-      tagline: document.getElementById('p-tagline').value.trim(),
-
-      bio: document.getElementById('p-bio').value.trim(),
-
-      area: document.getElementById('p-area').value.trim(),
-
-      city: document.getElementById('p-city').value.trim(),
-
-      fee: Number(document.getElementById('p-fee').value) || 0,
-
-      preferredLocation: document.getElementById('p-area').value.trim(),
-
-      boards: getChecked('boards-group'),
-
-      subjects: getChecked('subjects-group'),
-
-      classes: getChecked('classes-group'),
-
-      mode: getChecked('mode-group'),
-
-      updatedAt: serverTimestamp()
-
-    };
-
-
-
-    if (isReapply) {
-
+    if (isReapply || isSubmit) {
       data.status = 'pending';
-
       data.rejectionReason = null;
-
+      data.profileCompleted = true;
+      data.profileSubmitted = true;
       data.submittedAt = serverTimestamp();
-
     }
 
-
-
     try {
-
-      const photoFile = document.getElementById('p-photo').files[0];
-
       if (photoFile) {
-
         try {
-
           const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.${photoFile.name.split('.').pop()}`);
-
           await uploadBytes(photoRef, photoFile);
-
           data.profileImageUrl = await getDownloadURL(photoRef);
-
-        } catch(uploadErr) {
-
-          console.error('Photo upload failed:', uploadErr);
-
-        }
-
+        } catch(e) { console.error('Photo error:', e); }
       }
-
-
-
-      const certFile = document.getElementById('p-cert').files[0];
 
       if (certFile) {
-
         try {
-
           const certRef = ref(storage, `tutors/${currentUser.uid}/certificate.${certFile.name.split('.').pop()}`);
-
           await uploadBytes(certRef, certFile);
-
           data.documentUrl = await getDownloadURL(certRef);
-
-        } catch(uploadErr) {
-
-          console.error('Certificate upload failed:', uploadErr);
-
-        }
-
+        } catch(e) { console.error('Cert error:', e); }
       }
-
-
 
       await updateDoc(doc(db, 'users', currentUser.uid), data);
-
       tutorProfile = { ...tutorProfile, ...data };
-
       updateProfileCompletion();
 
-
-
-      if (isReapply) {
-
-        showMsg('profile-msg', 'Profile resubmitted for review! You will be notified when your application is reviewed.', 'success');
-
+      if (isReapply || isSubmit) {
+        showMsg('profile-msg', 'Profile submitted successfully! It is now under review.', 'success');
         btn.dataset.reapply = 'false';
-
+        btn.dataset.submit = 'false';
+        renderStatusBanner(tutorProfile);
       } else {
-
-        showMsg('profile-msg', 'Profile saved successfully!', 'success');
-
+        showMsg('profile-msg', 'Profile updated successfully!', 'success');
       }
 
-
-
       const first = data.fullName.split(' ')[0] || 'Tutor';
-
       document.getElementById('nav-user-name').textContent = first;
-
       document.getElementById('welcome-name').textContent = first;
 
     } catch(e) {
-
-      showMsg('profile-msg', 'Failed to save profile. Please try again.', 'error');
-
+      showMsg('profile-msg', 'Failed to save profile.', 'error');
     }
-
+    
     btn.disabled = false;
-
-    btn.innerHTML = '<i data-lucide="save"></i> Save Profile';
-
-    btn.dataset.reapply = 'false';
-
+    btn.innerHTML = '<i data-lucide="save"></i> Update Profile';
+    if (!tutorProfile.profileSubmitted) btn.innerHTML = '<i data-lucide="send"></i> Submit Profile';
     lucide.createIcons();
-
   });
-
-
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

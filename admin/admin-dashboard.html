@@ -328,5 +328,48 @@
     backdrop.classList.remove('open');
   });
 </script>
+
+<!-- ━━━ ADMIN PROFILE MODAL ━━━ -->
+<div class="modal" id="admin-profile-modal">
+  <div class="modal-content" style="max-width: 600px;">
+    <button class="modal-close" id="profile-modal-close"><i data-lucide="x"></i></button>
+    <div class="modal-header">
+      <h2 class="modal-title">Tutor Profile</h2>
+    </div>
+    <div class="modal-body" id="admin-profile-content">
+      <!-- Injected by JS -->
+    </div>
+    <div class="modal-actions" id="admin-profile-actions">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ━━━ FULL SCREEN IMAGE VIEWER ━━━ -->
+<div class="modal" id="image-viewer-modal" style="z-index: 1000;">
+  <div class="modal-content" style="max-width: 90vw; max-height: 90vh; background: transparent; box-shadow: none; padding: 0;">
+    <button class="modal-close" id="image-viewer-close" style="color: white; background: rgba(0,0,0,0.5); border-radius: 50%;"><i data-lucide="x"></i></button>
+    <div class="modal-body" style="text-align: center;">
+      <img id="image-viewer-img" src="" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px;">
+    </div>
+  </div>
+</div>
+
+<!-- ━━━ FULL SCREEN DOC VIEWER ━━━ -->
+<div class="modal" id="doc-viewer-modal" style="z-index: 1000;">
+  <div class="modal-content" style="max-width: 90vw; height: 90vh; background: white; padding: 0; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
+      <h2 class="modal-title" style="margin: 0; font-size: 1.1rem;">Document Viewer</h2>
+      <div style="display: flex; gap: 10px;">
+        <a id="doc-viewer-download" href="#" target="_blank" class="btn btn-outline btn-sm"><i data-lucide="external-link"></i> Open Original</a>
+        <button class="modal-close" id="doc-viewer-close" style="position: static;"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div class="modal-body" style="flex: 1; padding: 0;">
+      <iframe id="doc-viewer-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -449,8 +449,11 @@
         const fullData = { email: currentUser.email, role: role };
 
         if (role === 'tutor') {
-          fullData.status = 'pending';
-          fullData.submittedAt = serverTimestamp();
+          fullData.profileCompleted = false;
+          fullData.profileSubmitted = false;
+          fullData.status = null;
+          fullData.approvalSeen = false;
+          fullData.submittedAt = null;
           fullData.rejectionReason = null;
           fullData.reviewedAt = null;
           fullData.profileImageUrl = null;

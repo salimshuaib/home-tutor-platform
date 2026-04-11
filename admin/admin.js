@@ -231,10 +231,10 @@ function tutorCard(t) {
   const exp = t.experience ? `${t.experience} yrs exp` : 'N/A';
   const submitted = t.submittedAt ? formatDate(t.submittedAt) : (t.createdAt ? formatDate(t.createdAt) : 'N/A');
   const profileImg = t.profileImageUrl
-    ? `<img src="${safeText(t.profileImageUrl)}" alt="Profile" class="tutor-card-avatar-img">`
+    ? `<img src="${safeText(t.profileImageUrl)}" alt="Profile" class="tutor-card-avatar-img" style="cursor:pointer;" onclick="window.adminActions.viewImage('${safeText(t.profileImageUrl)}')">`
     : `<span>${initials}</span>`;
   const docLink = t.documentUrl
-    ? `<a href="${safeText(t.documentUrl)}" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><i data-lucide="file-text"></i> View Document</a>`
+    ? `<button onclick="window.adminActions.viewDoc('${safeText(t.documentUrl)}')" class="btn btn-outline btn-sm"><i data-lucide="file-text"></i> View Document</button>`
     : `<span class="no-doc"><i data-lucide="file-x"></i> No document</span>`;
 
   return `
@@ -253,16 +253,19 @@ function tutorCard(t) {
       <span class="meta-tag"><i data-lucide="calendar"></i> Applied: ${safeText(submitted)}</span>
     </div>
     <div class="tutor-card-docs">${docLink}</div>
-    <div class="tutor-card-actions">
-      <button class="btn btn-approve" onclick="window.adminActions.approve('${t.id}', this)">
+    <div class="tutor-card-actions" style="display:flex; flex-wrap:wrap; gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="window.adminActions.viewProfile('${t.id}')">
+        <i data-lucide="user"></i> View Profile
+      </button>
+      <button class="btn btn-approve btn-sm" onclick="window.adminActions.approve('${t.id}', this)">
         <i data-lucide="check"></i> Approve
       </button>
-      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${t.id}', '${safeText(name)}')">
+      <button class="btn btn-reject btn-sm" onclick="window.adminActions.openRejectModal('${t.id}', '${safeText(name)}')">
         <i data-lucide="x"></i> Reject
       </button>
     </div>
   </div>`;
-}
+
 
 function tutorListItem(t, type) {
   const name = t.fullName || 'Unknown';
@@ -396,3 +399,99 @@ window.adminActions = {
 };
 
 export { initAdminAuth, switchSection };
+
+
+/* ━━━ ADMIN ACTIONS (VIEWERS) ━━━ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Modals closure setup
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.target.closest('.modal').classList.remove('open');
+    });
+  });
+
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', (e) => {
+      if(e.target === m) m.classList.remove('open');
+    });
+  });
+});
+
+window.adminActions.viewImage = function(url) {
+  const modal = document.getElementById('image-viewer-modal');
+  const img = document.getElementById('image-viewer-img');
+  if(modal && img) {
+    img.src = url;
+    modal.classList.add('open');
+  }
+};
+
+window.adminActions.viewDoc = function(url) {
+  const modal = document.getElementById('doc-viewer-modal');
+  const iframe = document.getElementById('doc-viewer-iframe');
+  const dl = document.getElementById('doc-viewer-download');
+  if(modal && iframe && dl) {
+    iframe.src = url;
+    dl.href = url;
+    modal.classList.add('open');
+  }
+};
+
+window.adminActions.viewProfile = function(uid) {
+  const tutor = allTutors.find(t => t.id === uid);
+  if (!tutor) return;
+  const modal = document.getElementById('admin-profile-modal');
+  const content = document.getElementById('admin-profile-content');
+  const actions = document.getElementById('admin-profile-actions');
+  if(!modal || !content || !actions) return;
+
+  const subjects = (tutor.subjects || []).join(', ') || 'None';
+  const classes = (tutor.classes || []).join(', ') || 'None';
+  const modes = (tutor.mode || []).join(', ') || 'None';
+  const boards = (tutor.boards || []).join(', ') || 'None';
+
+  content.innerHTML = `
+    <div style="display:flex; gap: 15px; margin-bottom: 20px;">
+      ${tutor.profileImageUrl ? `<img src="${safeText(tutor.profileImageUrl)}" style="width:100px; height:100px; border-radius:12px; object-fit:cover; cursor:pointer;" onclick="window.adminActions.viewImage('${safeText(tutor.profileImageUrl)}')">` : ''}
+      <div>
+        <h3 style="font-size:1.4rem; color:var(--navy);">${safeText(tutor.fullName || 'Unknown')}</h3>
+        <p style="color:var(--text-mid); font-size: 0.9rem;">${safeText(tutor.email)} &bull; ${safeText(tutor.phone || 'No phone')}</p>
+        <p style="color:var(--text-mid); font-size: 0.9rem; margin-top:5px;"><strong>Tagline:</strong> ${safeText(tutor.tagline || '-')}</p>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; background:#f9f9f9; padding:15px; border-radius:12px; margin-bottom:20px;">
+      <div><strong>Subjects:</strong> <br><span style="font-size:0.9rem">${safeText(subjects)}</span></div>
+      <div><strong>Classes:</strong> <br><span style="font-size:0.9rem">${safeText(classes)}</span></div>
+      <div><strong>Boards:</strong> <br><span style="font-size:0.9rem">${safeText(boards)}</span></div>
+      <div><strong>Modes:</strong> <br><span style="font-size:0.9rem">${safeText(modes)}</span></div>
+      <div><strong>Area/City:</strong> <br><span style="font-size:0.9rem">${safeText(tutor.area || '')}, ${safeText(tutor.city || '')}</span></div>
+      <div><strong>Experience:</strong> <br><span style="font-size:0.9rem">${safeText(tutor.experience || 0)} yrs</span></div>
+      <div><strong>Monthly Fee:</strong> <br><span style="font-size:0.9rem">₹${safeText(tutor.fee || 0)}</span></div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <strong>Bio:</strong>
+      <p style="background:#f9f9f9; padding:10px; border-radius:8px; font-size:0.9rem; margin-top:5px; white-space:pre-wrap;">${safeText(tutor.bio || 'No bio provided.')}</p>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      ${tutor.documentUrl ? `<button onclick="window.adminActions.viewDoc('${safeText(tutor.documentUrl)}')" class="btn btn-outline"><i data-lucide="file-text"></i> View Certificate</button>` : '<span>No Document</span>'}
+    </div>
+  `;
+
+  let actionBtns = '';
+  if(tutor.status === 'pending' || !tutor.status) {
+    actionBtns = `
+      <button class="btn btn-approve" onclick="window.adminActions.approve('${uid}', this); document.getElementById('admin-profile-modal').classList.remove('open');">
+        <i data-lucide="check"></i> Approve
+      </button>
+      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-modal').classList.remove('open');">
+        <i data-lucide="x"></i> Reject
+      </button>`;
+  } else if(tutor.status === 'approved') {
+    actionBtns = `<button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-modal').classList.remove('open');"><i data-lucide="x"></i> Suspend/Reject Tutor</button>`;
+  }
+  
+  actions.innerHTML = actionBtns;
+  modal.classList.add('open');
+  lucide.createIcons();
+};
+
