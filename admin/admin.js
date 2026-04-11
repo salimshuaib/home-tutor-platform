@@ -373,8 +373,8 @@ function switchSection(name) {
   const sec = $('sec-' + name);
   if (sec) sec.classList.add('active');
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.section === name));
-  $('sidebar').classList.remove('open');
-  $('sidebar-backdrop').classList.remove('open');
+  $('sidebar').classList.remove('show');
+  $('sidebar-backdrop').classList.remove('show');
   renderCurrentSection();
   if (window.lucide) lucide.createIcons();
 }
@@ -406,41 +406,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // Modals closure setup
   document.querySelectorAll('.modal-close').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      e.target.closest('.modal').classList.remove('open');
+      e.target.closest('.modal').classList.remove('show');
     });
   });
 
   document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', (e) => {
-      if(e.target === m) m.classList.remove('open');
+      if(e.target === m) m.classList.remove('show');
     });
   });
 });
 
 window.adminActions.viewImage = function(url) {
-  const modal = document.getElementById('image-viewer-modal');
+  const modal = document.getElementById('image-viewer-overlay');
   const img = document.getElementById('image-viewer-img');
   if(modal && img) {
     img.src = url;
-    modal.classList.add('open');
+    modal.classList.add('show');
   }
 };
 
 window.adminActions.viewDoc = function(url) {
-  const modal = document.getElementById('doc-viewer-modal');
+  const modal = document.getElementById('doc-viewer-overlay');
   const iframe = document.getElementById('doc-viewer-iframe');
   const dl = document.getElementById('doc-viewer-download');
   if(modal && iframe && dl) {
     iframe.src = url;
     dl.href = url;
-    modal.classList.add('open');
+    modal.classList.add('show');
   }
 };
 
 window.adminActions.viewProfile = function(uid) {
   const tutor = allTutors.find(t => t.id === uid);
   if (!tutor) return;
-  const modal = document.getElementById('admin-profile-modal');
+  const modal = document.getElementById('admin-profile-overlay');
   const content = document.getElementById('admin-profile-content');
   const actions = document.getElementById('admin-profile-actions');
   if(!modal || !content || !actions) return;
@@ -480,18 +480,18 @@ window.adminActions.viewProfile = function(uid) {
   let actionBtns = '';
   if(tutor.status === 'pending' || !tutor.status) {
     actionBtns = `
-      <button class="btn btn-approve" onclick="window.adminActions.approve('${uid}', this); document.getElementById('admin-profile-modal').classList.remove('open');">
+      <button class="btn btn-approve" onclick="window.adminActions.approve('${uid}', this); document.getElementById('admin-profile-overlay').classList.remove('show');">
         <i data-lucide="check"></i> Approve
       </button>
-      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-modal').classList.remove('open');">
+      <button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');">
         <i data-lucide="x"></i> Reject
       </button>`;
   } else if(tutor.status === 'approved') {
-    actionBtns = `<button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-modal').classList.remove('open');"><i data-lucide="x"></i> Suspend/Reject Tutor</button>`;
+    actionBtns = `<button class="btn btn-reject" onclick="window.adminActions.openRejectModal('${uid}', '${safeText(tutor.fullName || '')}'); document.getElementById('admin-profile-overlay').classList.remove('show');"><i data-lucide="x"></i> Suspend/Reject Tutor</button>`;
   }
   
   actions.innerHTML = actionBtns;
-  modal.classList.add('open');
+  modal.classList.add('show');
   lucide.createIcons();
 };
 
