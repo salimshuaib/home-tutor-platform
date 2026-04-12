@@ -1414,16 +1414,32 @@
 
     try {
       console.log("Uploading files...");
-      if (photoFile) {
-        const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.jpg`);
-        await uploadBytes(photoRef, photoFile);
-        data.profileImageUrl = await getDownloadURL(photoRef);
+      
+      const uploadWithTimeout = (reference, file, ms = 8000) => {
+        return Promise.race([
+          uploadBytes(reference, file),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Upload timeout (Billing/CORS issue)')), ms))
+        ]);
+      };
+
+      try {
+        if (photoFile) {
+          const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.jpg`);
+          await uploadWithTimeout(photoRef, photoFile);
+          data.profileImageUrl = await getDownloadURL(photoRef);
+        }
+      } catch(err) {
+        console.error("Photo upload failed:", err.message);
       }
 
-      if (certFile) {
-        const certRef = ref(storage, `tutors/${currentUser.uid}/certificate`);
-        await uploadBytes(certRef, certFile);
-        data.documentUrl = await getDownloadURL(certRef);
+      try {
+        if (certFile) {
+          const certRef = ref(storage, `tutors/${currentUser.uid}/certificate`);
+          await uploadWithTimeout(certRef, certFile);
+          data.documentUrl = await getDownloadURL(certRef);
+        }
+      } catch(err) {
+        console.error("Certificate upload failed:", err.message);
       }
 
       console.log("Saving data to Firestore...");
