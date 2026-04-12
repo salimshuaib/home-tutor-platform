@@ -1415,31 +1415,47 @@
     try {
       console.log("Uploading files...");
       
-      const uploadWithTimeout = (reference, file, ms = 8000) => {
-        return Promise.race([
-          uploadBytes(reference, file),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Upload timeout (Billing/CORS issue)')), ms))
-        ]);
+      const uploadWithFallback = async (reference, file, type) => {
+        try {
+          // Attempt Firebase Storage First
+          const uploadPromise = Promise.race([
+             uploadBytes(reference, file),
+             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+          ]);
+          await uploadPromise;
+          return await getDownloadURL(reference);
+        } catch (err) {
+          console.warn(`Firebase Storage failed for ${type}. Falling back to Base64 (Firestore limits apply).`, err);
+          // Fallback to Base64
+          return new Promise((resolve, reject) => {
+            if (file.size > 800 * 1024) {
+              reject(new Error(`File too large (${(file.size/1024).toFixed(0)}KB). Max 800KB due to Storage issues.`));
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error('Failed to read file as Base64'));
+            reader.readAsDataURL(file);
+          });
+        }
       };
 
       try {
         if (photoFile) {
           const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.jpg`);
-          await uploadWithTimeout(photoRef, photoFile);
-          data.profileImageUrl = await getDownloadURL(photoRef);
+          data.profileImageUrl = await uploadWithFallback(photoRef, photoFile, 'profile image');
         }
       } catch(err) {
-        console.error("Photo upload failed:", err.message);
+        throw new Error("Photo upload failed: " + err.message);
       }
 
       try {
         if (certFile) {
           const certRef = ref(storage, `tutors/${currentUser.uid}/certificate`);
-          await uploadWithTimeout(certRef, certFile);
-          data.documentUrl = await getDownloadURL(certRef);
+          data.documentUrl = await uploadWithFallback(certRef, certFile, 'certificate');
         }
       } catch(err) {
-        console.error("Certificate upload failed:", err.message);
+        throw new Error("Certificate upload failed: " + err.message);
       }
 
       console.log("Saving data to Firestore...");
