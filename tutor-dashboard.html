@@ -1082,6 +1082,11 @@
 
         gateLeadAccess(d.status);
 
+        if (d.profileSubmitted === true && d.status === 'pending') {
+          disableProfileForm();
+          showMsg('profile-msg', 'Your profile is sent for approval', 'success');
+        }
+
       }
 
     } catch(e) { console.error(e); }
@@ -1130,6 +1135,10 @@
         renderStatusBanner(d);
 
         gateLeadAccess(d.status);
+
+        if (d.profileSubmitted === true && d.status === 'pending') {
+          disableProfileForm();
+        }
 
       }
 
@@ -1239,6 +1248,20 @@
 
   }
 
+  /* ── LOCK FORM HELPER ── */
+  window.disableProfileForm = function() {
+    document.querySelectorAll('#sec-profile input, #sec-profile textarea, #sec-profile select, .check-pill').forEach(el => {
+      el.style.pointerEvents = 'none';
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') { 
+        el.disabled = true; 
+        el.style.opacity = '0.7'; 
+      }
+    });
+    document.querySelectorAll('.file-upload').forEach(el => el.style.pointerEvents = 'none');
+    const btn = document.getElementById('save-profile-btn');
+    if (btn) btn.style.display = 'none';
+  };
+
 
 
   /* ── RE-APPLICATION ── */
@@ -1330,7 +1353,8 @@
 
 
   /* ── SAVE PROFILE ── */
-  document.getElementById('save-profile-btn').addEventListener('click', async () => {
+  document.getElementById('save-profile-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
     const btn = document.getElementById('save-profile-btn');
     const isReapply = btn.dataset.reapply === 'true';
     const isSubmit = btn.dataset.submit === 'true';
@@ -1349,6 +1373,7 @@
       bio: document.getElementById('p-bio').value.trim(),
       area: document.getElementById('p-area').value.trim(),
       city: document.getElementById('p-city').value.trim(),
+      location: document.getElementById('p-area').value.trim(),
       fee: Number(document.getElementById('p-fee').value) || 0,
       preferredLocation: document.getElementById('p-area').value.trim(),
       boards: getChecked('boards-group'),
@@ -1388,30 +1413,30 @@
     }
 
     try {
+      console.log("Uploading files...");
       if (photoFile) {
-        try {
-          const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.${photoFile.name.split('.').pop()}`);
-          await uploadBytes(photoRef, photoFile);
-          data.profileImageUrl = await getDownloadURL(photoRef);
-        } catch(e) { console.error('Photo error:', e); }
+        const photoRef = ref(storage, `tutors/${currentUser.uid}/profile.jpg`);
+        await uploadBytes(photoRef, photoFile);
+        data.profileImageUrl = await getDownloadURL(photoRef);
       }
 
       if (certFile) {
-        try {
-          const certRef = ref(storage, `tutors/${currentUser.uid}/certificate.${certFile.name.split('.').pop()}`);
-          await uploadBytes(certRef, certFile);
-          data.documentUrl = await getDownloadURL(certRef);
-        } catch(e) { console.error('Cert error:', e); }
+        const certRef = ref(storage, `tutors/${currentUser.uid}/certificate`);
+        await uploadBytes(certRef, certFile);
+        data.documentUrl = await getDownloadURL(certRef);
       }
 
-      await updateDoc(doc(db, 'users', currentUser.uid), data);
+      console.log("Saving data to Firestore...");
+      await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
       tutorProfile = { ...tutorProfile, ...data };
       updateProfileCompletion();
 
       if (isReapply || isSubmit) {
-        showMsg('profile-msg', 'Profile submitted successfully! It is now under review.', 'success');
+        console.log("Profile submitted successfully");
+        showMsg('profile-msg', 'Your profile has been submitted for approval', 'success');
         btn.dataset.reapply = 'false';
         btn.dataset.submit = 'false';
+        disableProfileForm();
         renderStatusBanner(tutorProfile);
       } else {
         showMsg('profile-msg', 'Profile updated successfully!', 'success');
@@ -1421,14 +1446,17 @@
       document.getElementById('nav-user-name').textContent = first;
       document.getElementById('welcome-name').textContent = first;
 
-    } catch(e) {
+    } catch(error) {
+      console.error("Save error:", error);
       showMsg('profile-msg', 'Failed to save profile.', 'error');
+    } finally {
+      if (!tutorProfile.profileSubmitted || tutorProfile.status !== 'pending') {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="save"></i> Update Profile';
+        if (!tutorProfile.profileSubmitted) btn.innerHTML = '<i data-lucide="send"></i> Submit Profile';
+      }
+      lucide.createIcons();
     }
-    
-    btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="save"></i> Update Profile';
-    if (!tutorProfile.profileSubmitted) btn.innerHTML = '<i data-lucide="send"></i> Submit Profile';
-    lucide.createIcons();
   });
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
