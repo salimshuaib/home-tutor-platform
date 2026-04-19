@@ -1,13 +1,15 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { LayoutDashboard, Search, FileText, List, User } from 'lucide-react';
-
-// Section stubs — we'll build these out in Phase 7
-function Overview() { return <div className="section-content"><h2>Dashboard Overview</h2><p>Welcome to your student dashboard.</p></div>; }
-function HireTeacher() { return <div className="section-content"><h2>Hire a Teacher</h2><p>Browse available tutors.</p></div>; }
-function PostRequirement() { return <div className="section-content"><h2>Post Requirement</h2><p>Post a new tuition requirement.</p></div>; }
-function MyRequests() { return <div className="section-content"><h2>My Requests</h2><p>View your tuition requests.</p></div>; }
-function StudentProfile() { return <div className="section-content"><h2>Profile</h2><p>Manage your profile.</p></div>; }
+import Overview from './sections/Overview';
+import HireTeacher from './sections/HireTeacher';
+import PostRequirement from './sections/PostRequirement';
+import MyRequests from './sections/MyRequests';
+import StudentProfile from './sections/StudentProfile';
 
 const sidebarLinks = [
   { to: '/student', label: 'Overview', icon: <LayoutDashboard size={18} />, end: true },
@@ -18,13 +20,27 @@ const sidebarLinks = [
 ];
 
 export default function StudentDashboard() {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'requests'), where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
+    const unsub = onSnapshot(q, snap => {
+      const list = [];
+      snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+      setRequests(list);
+    });
+    return unsub;
+  }, [user]);
+
   return (
     <Routes>
       <Route element={<DashboardLayout sidebarLinks={sidebarLinks} />}>
-        <Route index element={<Overview />} />
+        <Route index element={<Overview requests={requests} />} />
         <Route path="hire" element={<HireTeacher />} />
         <Route path="post" element={<PostRequirement />} />
-        <Route path="requests" element={<MyRequests />} />
+        <Route path="requests" element={<MyRequests requests={requests} />} />
         <Route path="profile" element={<StudentProfile />} />
       </Route>
     </Routes>
