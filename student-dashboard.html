@@ -13,6 +13,21 @@
     html{scroll-behavior:smooth}
     body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;min-height:100vh}
 
+    /* SKELETON UI */
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    .skeleton-base { background: rgba(15,30,60,0.06); position: relative; overflow: hidden; border-radius: 8px; }
+    .skeleton-base::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(232,117,26,0.08), transparent);
+      transform: translateX(-100%); animation: shimmer 1.5s infinite;
+    }
+    .skeleton-card { height: 180px; width: 100%; border-radius: 14px; margin-bottom: 1rem; }
+    .skeleton-req-card { height: 80px; width: 100%; border-radius: 12px; margin-bottom: 0.75rem; }
+    .skeleton-text { height: 18px; margin-bottom: 8px; width: 80%; }
+    .skeleton-avatar { height: 52px; width: 52px; border-radius: 12px; flex-shrink: 0; }
+
     /* LOADER */
     .loader-overlay{position:fixed;inset:0;background:var(--navy);z-index:2000;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
     .loader-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--saffron);border-radius:50%;animation:spin 1s linear infinite}
@@ -367,6 +382,10 @@
   import { getAuth, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy, serverTimestamp, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+  import { handleError, createInlineErrorUI } from './js/errorHandler.js';
+  import { debounce } from './js/debounce.js';
+  import { getCachedData, setCachedData } from './js/cache.js';
+
   const app = initializeApp({apiKey:"AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",authDomain:"hometutor-2dbc0.firebaseapp.com",projectId:"hometutor-2dbc0",storageBucket:"hometutor-2dbc0.firebasestorage.app",messagingSenderId:"792391008247",appId:"1:792391008247:web:fa9e76a8caa448351d38f2"});
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -402,7 +421,7 @@
       } else {
          // Might be a new user or legacy
       }
-    } catch(e) { console.error("Auth check error:", e); }
+    } catch(e) { handleError(e, 'Student auth check'); }
 
     currentUser = user;
     let displayName = userProfileData.fullName || user.displayName || 'Student';
@@ -462,7 +481,34 @@
 
   /* TUTORS DATA */
   let allTutors = [];
+
+  function showTutorSkeletons() {
+    const grid = document.getElementById('tutor-list');
+    grid.innerHTML = Array(6).fill(0).map(() => `
+      <div class="skeleton-base skeleton-card" style="display:flex; flex-direction:column; padding:1.25rem;">
+        <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+          <div class="skeleton-base skeleton-avatar"></div>
+          <div style="flex:1;">
+            <div class="skeleton-base skeleton-text" style="width:60%"></div>
+            <div class="skeleton-base skeleton-text" style="width:40%"></div>
+          </div>
+        </div>
+        <div class="skeleton-base skeleton-text" style="width:90%"></div>
+        <div class="skeleton-base skeleton-text" style="width:50%"></div>
+      </div>
+    `).join('');
+  }
+
   async function loadTutorsFromFirestore() {
+    const cached = getCachedData('tutors_list');
+    if (cached) {
+      allTutors = cached;
+      renderTutors(allTutors);
+      return;
+    }
+
+    showTutorSkeletons();
+
     try {
       const q = query(collection(db, 'users'), where('role', '==', 'tutor'), where('status', '==', 'approved'));
       const snap = await getDocs(q);
@@ -480,8 +526,12 @@
           feeNum: Number(data.fee) || 0
         });
       });
+      setCachedData('tutors_list', allTutors, 5 * 60 * 1000); // cache for 5 minutes
       renderTutors(allTutors);
-    } catch(e) { console.error("Load tutors error:", e); }
+    } catch(e) {
+      const errMsg = handleError(e, 'Failed to fetch tutors');
+      createInlineErrorUI('tutor-list', errMsg, loadTutorsFromFirestore);
+    }
   }
 
   function renderTutors(list) {
@@ -510,7 +560,7 @@
   }
 
   /* FILTERS */
-  document.querySelectorAll('.filter-select').forEach(sel => sel.addEventListener('change', () => {
+  const onFilterChangeDebounced = debounce(() => {
     const subj = document.getElementById('f-subject').value.toLowerCase();
     const loc = document.getElementById('f-location').value.toLowerCase();
     const budget = document.getElementById('f-budget').value;
@@ -525,20 +575,35 @@
       else if (budget.includes('20,000+')) filtered = filtered.filter(t => t.feeNum >= 20000);
     }
     renderTutors(filtered);
-  }));
+  }, 300);
+
+  document.querySelectorAll('.filter-select').forEach(sel => sel.addEventListener('change', onFilterChangeDebounced));
 
   /* REQUESTS */
   let unsubRequests = null;
   async function loadRequests() {
     if (!currentUser) return;
     if (unsubRequests) unsubRequests();
-    const q = query(collection(db, 'requests'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-    unsubRequests = onSnapshot(q, (snap) => {
-      userRequests = [];
-      snap.forEach(d => userRequests.push({ id: d.id, ...d.data() }));
-      renderRequests();
-      updateStats();
-    });
+
+    document.getElementById('my-requests-list').innerHTML = Array(3).fill(0).map(() => `
+      <div class="skeleton-base skeleton-req-card"></div>
+    `).join('');
+
+    try {
+      const q = query(collection(db, 'requests'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+      unsubRequests = onSnapshot(q, (snap) => {
+        userRequests = [];
+        snap.forEach(d => userRequests.push({ id: d.id, ...d.data() }));
+        renderRequests();
+        updateStats();
+      }, (error) => {
+        const errMsg = handleError(error, 'Failed to sync requests');
+        createInlineErrorUI('my-requests-list', errMsg, loadRequests);
+      });
+    } catch (e) {
+      const errMsg = handleError(e, 'Failed to fetch requests');
+      createInlineErrorUI('my-requests-list', errMsg, loadRequests);
+    }
   }
 
   function renderRequests(filter = 'all') {
@@ -644,7 +709,13 @@
 
   window.deleteRequest = async function(id) {
     if (confirm('Delete this request?')) {
-      try { await deleteDoc(doc(db, 'requests', id)); } catch(e) { alert('Delete failed.'); }
+      try { 
+        await deleteDoc(doc(db, 'requests', id)); 
+        showMsg('post-msg', 'Request deleted successfully.', 'success');
+      } catch(e) { 
+        const errMsg = handleError(e, 'Failed to delete request');
+        showMsg('post-msg', errMsg, 'error');
+      }
     }
   };
 

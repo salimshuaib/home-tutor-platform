@@ -19,6 +19,17 @@ service cloud.firestore {
       return isAuth() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    // ─── VALIDATION HELPERS ───
+    function validString(field) {
+      return field is string && field.size() > 0;
+    }
+    function validFullName(data) {
+      return data.fullName is string && data.fullName.size() > 2 && data.fullName.size() <= 100;
+    }
+    function validArrayField(data, field, maxLen) {
+      return !data.keys().hasAll([field]) || (data[field] is list && data[field].size() <= maxLen);
+    }
+
     // ─── ADMINS COLLECTION ───
     // Admins can only read their own record. Write is denied (manage via Firebase Console).
     match /admins/{adminId} {
@@ -32,13 +43,25 @@ service cloud.firestore {
     // EXCEPT: a tutor can reset their own status from "rejected" to "pending" (re-application).
     match /users/{userId} {
       allow read: if isAuth();
-      allow create: if isOwner(userId);
+
+      // Create: must be owner, must have fullName > 2 chars, arrays capped at 20
+      allow create: if isOwner(userId)
+        && validFullName(request.resource.data)
+        && validArrayField(request.resource.data, 'subjects', 20)
+        && validArrayField(request.resource.data, 'classes', 20)
+        && validArrayField(request.resource.data, 'boards', 20)
+        && validArrayField(request.resource.data, 'mode', 5);
 
       // Admin can update any user field
       allow update: if isAdmin();
 
       // Owner can update their own profile, with restrictions on status fields
       allow update: if isOwner(userId)
+        && validFullName(request.resource.data)
+        && validArrayField(request.resource.data, 'subjects', 20)
+        && validArrayField(request.resource.data, 'classes', 20)
+        && validArrayField(request.resource.data, 'boards', 20)
+        && validArrayField(request.resource.data, 'mode', 5)
         && (
           // Case 1: No protected fields are being changed
           !request.resource.data.diff(resource.data).affectedKeys()
@@ -70,10 +93,14 @@ service cloud.firestore {
       // Anyone authenticated can read requests (tutors browse pending ones)
       allow read: if isAuth();
 
-      // Only verified users can create, and must set studentUID/userId to their own UID
+      // Only verified users can create, and must set userId to their own UID
+      // Required fields: className, subject, location, mode
       allow create: if isVerified()
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.studentUID == request.auth.uid;
+        && validString(request.resource.data.className)
+        && validString(request.resource.data.subject)
+        && validString(request.resource.data.location)
+        && validString(request.resource.data.mode);
 
       // Owner can update their own request (all fields)
       allow update: if isAuth()
@@ -90,10 +117,9 @@ service cloud.firestore {
       // Admins can update any request
       allow update: if isAdmin();
 
-      // BUG 20: Only the owner of the request can delete it
+      // Only the owner of the request can delete it
       allow delete: if isAuth()
-        && (resource.data.userId == request.auth.uid
-            || resource.data.studentUID == request.auth.uid);
+        && (resource.data.userId == request.auth.uid);
     }
 
     // ─── LEADS COLLECTION ───
@@ -102,8 +128,10 @@ service cloud.firestore {
       allow read: if isAuth()
         && resource.data.tutorId == request.auth.uid;
 
+      // Create: must set tutorId to own UID, must have requestId
       allow create: if isVerified()
-        && request.resource.data.tutorId == request.auth.uid;
+        && request.resource.data.tutorId == request.auth.uid
+        && validString(request.resource.data.requestId);
 
       allow update: if isAuth()
         && resource.data.tutorId == request.auth.uid;

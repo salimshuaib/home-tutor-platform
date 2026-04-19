@@ -12,6 +12,8 @@ import {
   orderBy, onSnapshot, serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+import { handleError } from '../js/errorHandler.js';
+
 /* ━━━ FIREBASE INIT ━━━ */
 const app = initializeApp({
   apiKey: "AIzaSyAs8f05aOnxXvsMwtypdr1k_4DhpIIxIbc",
@@ -63,8 +65,8 @@ function initAdminAuth() {
 
       if (!adminSnap.exists()) {
         console.warn("Access denied: Not an admin");
-        alert("Access denied");
-        window.location.href = "../login.html";
+        showToast('Access denied. You are not authorized as an admin.', 'error');
+        setTimeout(() => window.location.href = "../login.html", 1500);
         return;
       }
 
@@ -81,7 +83,7 @@ function initAdminAuth() {
       loadAdminDashboard(adminSnap.data());
 
     } catch (error) {
-      console.error("Admin check error:", error);
+      handleError(error, 'Admin auth check');
 
       const loader = document.getElementById("loader");
       if (loader) {
@@ -140,7 +142,7 @@ function startTutorListener() {
     updateStats();
     renderCurrentSection();
   }, (error) => {
-    console.error('Tutor listener error:', error);
+    handleError(error, 'Tutor listener');
     showToast('Failed to load tutors. Please refresh.', 'error');
   });
 }
@@ -323,7 +325,7 @@ async function approveTutor(uid, btn) {
     });
     showToast('Tutor approved successfully!');
   } catch (e) {
-    console.error('Approve failed:', e);
+    handleError(e, 'Approve tutor');
     showToast('Failed to approve tutor. ' + e.message, 'error');
     btn.innerHTML = origHTML;
     btn.disabled = false;
@@ -369,7 +371,7 @@ async function confirmReject() {
     showToast('Tutor application rejected.');
     closeRejectModal();
   } catch (e) {
-    console.error('Reject failed:', e);
+    handleError(e, 'Reject tutor');
     showToast('Failed to reject tutor. ' + e.message, 'error');
   }
 

@@ -28,6 +28,21 @@
 
 
 
+    /* SKELETON UI */
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    .skeleton-base { background: rgba(15,30,60,0.06); position: relative; overflow: hidden; border-radius: 8px; }
+    .skeleton-base::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(232,117,26,0.08), transparent);
+      transform: translateX(-100%); animation: shimmer 1.5s infinite;
+    }
+    .skeleton-card { height: 180px; width: 100%; border-radius: 14px; margin-bottom: 1rem; }
+    .skeleton-req-card { height: 80px; width: 100%; border-radius: 12px; margin-bottom: 0.75rem; }
+    .skeleton-text { height: 18px; margin-bottom: 8px; width: 80%; }
+    .skeleton-avatar { height: 52px; width: 52px; border-radius: 12px; flex-shrink: 0; }
+
     .loader-overlay{position:fixed;inset:0;background:var(--navy);z-index:2000;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
 
     .loader-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--saffron);border-radius:50%;animation:spin 1s linear infinite}
@@ -864,7 +879,7 @@
 
         </div>
 
-        <div class="form-group full" style="margin-top:1rem"><label class="form-label">Danger Zone</label><button class="btn btn-danger btn-sm" onclick="alert('Contact support to delete account.')"><i data-lucide="trash-2"></i> Delete Account</button></div>
+        <div class="form-group full" style="margin-top:1rem"><label class="form-label">Danger Zone</label><button class="btn btn-danger btn-sm" onclick="showToast('Please contact support to delete your account.', 'error')"><i data-lucide="trash-2"></i> Delete Account</button></div>
 
       </div>
 
@@ -891,6 +906,10 @@
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
   import { matchAndScoreRequests, getMatchColor } from "./js/matching.js";
+
+  import { handleError, createInlineErrorUI } from './js/errorHandler.js';
+  import { debounce, throttle } from './js/debounce.js';
+  import { getCachedData, setCachedData } from './js/cache.js';
 
 
 
@@ -1089,7 +1108,7 @@
 
       }
 
-    } catch(e) { console.error(e); }
+    } catch(e) { handleError(e, 'Tutor auth check'); }
 
 
 
@@ -1479,8 +1498,8 @@
       document.getElementById('welcome-name').textContent = first;
 
     } catch(error) {
-      console.error("Save error:", error);
-      showMsg('profile-msg', 'Failed to save profile.', 'error');
+      const errMsg = handleError(error, 'Save profile');
+      showMsg('profile-msg', errMsg, 'error');
     } finally {
       if (!tutorProfile.profileSubmitted || tutorProfile.status !== 'pending') {
         btn.disabled = false;
@@ -1505,11 +1524,20 @@
 
     if (tutorProfile.status && tutorProfile.status !== 'approved') return;
 
-
-
     if (unsubRequests) unsubRequests();
 
-
+    document.getElementById('matches-container').innerHTML = Array(3).fill(0).map(() => `
+      <div class="skeleton-base skeleton-card" style="display:flex; flex-direction:column; padding:1.25rem;">
+        <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+          <div class="skeleton-base skeleton-avatar" style="border-radius:50%"></div>
+          <div style="flex:1;">
+            <div class="skeleton-base skeleton-text" style="width:50%"></div>
+            <div class="skeleton-base skeleton-text" style="width:30%"></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('overview-matches').innerHTML = document.getElementById('matches-container').innerHTML;
 
     // Real-time listener on all open/pending requests
 
@@ -1561,7 +1589,10 @@
 
       renderScoredMatches(matchedResults);
 
-    }, (err) => { /* Listener error — fallback silently */ });
+    }, (err) => { 
+        handleError(err, 'Failed to fetch matches');
+        createInlineErrorUI('matches-container', 'Failed to fetch matches', startMatchesListener);
+    });
 
   }
 
@@ -1849,6 +1880,20 @@
 
     if (!currentUser) return;
 
+    // Check cache first for instant display
+    const cachedLeads = getCachedData('tutor_leads_' + currentUser.uid);
+    if (cachedLeads) {
+      acceptedLeads = cachedLeads;
+      document.getElementById('s-accepted').textContent = acceptedLeads.length;
+      document.getElementById('s-ongoing').textContent = acceptedLeads.filter(l => l.status === 'ongoing').length;
+      renderLeads();
+    } else {
+      // Show skeletons only if no cached data
+      document.getElementById('leads-list').innerHTML = Array(3).fill(0).map(() => `
+        <div class="skeleton-base skeleton-req-card"></div>
+      `).join('');
+    }
+
     try {
 
       const q = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid), orderBy('appliedAt', 'desc'));
@@ -1857,19 +1902,20 @@
 
       snap.forEach(d => acceptedLeads.push({ id: d.id, ...d.data() }));
 
+      setCachedData('tutor_leads_' + currentUser.uid, acceptedLeads, 120000);
+
     } catch(e) {
 
-      // Fallback: try with old field name for backwards compatibility
-
       try {
-
         const q2 = query(collection(db, 'leads'), where('tutorId', '==', currentUser.uid));
-
         const snap2 = await getDocs(q2); acceptedLeads = [];
-
         snap2.forEach(d => acceptedLeads.push({ id: d.id, ...d.data() }));
-
-      } catch(e2) { acceptedLeads = []; }
+        setCachedData('tutor_leads_' + currentUser.uid, acceptedLeads, 120000);
+      } catch(e2) {
+         const errMsg = handleError(e2, 'Failed to fetch leads');
+         createInlineErrorUI('leads-list', errMsg, loadLeads);
+         return;
+      }
 
     }
 
@@ -1880,6 +1926,8 @@
     renderLeads();
 
   }
+
+
 
 
 
@@ -1958,6 +2006,7 @@
   }
 
   window.switchSection = switchSection;
+  window.showToast = showToast;
 
   document.querySelectorAll('.sidebar-link').forEach(l => l.addEventListener('click', () => switchSection(l.dataset.section)));
 
